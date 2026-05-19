@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/Servicios/">
+    <Project Path="Lib_Negocio/Lib_Negocio.csproj" />
+  </Folder>
+</Solution>
