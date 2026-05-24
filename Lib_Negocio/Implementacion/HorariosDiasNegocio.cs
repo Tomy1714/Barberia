@@ -18,45 +18,45 @@ namespace Lib_Negocio.Implementacion
             this.IConexion!.Database.GetConnectionString();
         }
 
-        public List<HorariosDias> Listar()
+        public List<HorarioDias> Listar()
         {
-            return this.IConexion!.HorariosDias
-                .Include(e => e.Horarios)
+            return this.IConexion!.HorarioDias
+                .Include(e => e.Horario)
                 .Take(50).ToList();
         }
 
-        public HorariosDias? Guardar(HorariosDias? entidad)
+        public HorarioDias? Guardar(HorarioDias? entidad)
         {
             if (entidad == null)
                 throw new Exception("lbFaltaInformacion");
             if (entidad.IdHorarioDia != 0)
                 throw new Exception("lbYaSeGuardo");
 
-            this.IConexion!.HorariosDias.Add(entidad);
+            this.IConexion!.HorarioDias.Add(entidad);
             this.IConexion.SaveChanges();
             return entidad;
         }
 
-        public HorariosDias? Modificar(HorariosDias? entidad)
+        public HorarioDias? Modificar(HorarioDias? entidad)
         {
             if (entidad == null)
                 throw new Exception("lbFaltaInformacion");
             if (entidad.IdHorarioDia == 0)
                 throw new Exception("lbNoSeGuardo");
 
-            this.IConexion!.HorariosDias.Update(entidad);
+            this.IConexion!.HorarioDias.Update(entidad);
             this.IConexion.SaveChanges();
             return entidad;
         }
 
-        public HorariosDias? Borrar(HorariosDias? entidad)
+        public HorarioDias? Borrar(HorarioDias? entidad)
         {
             if (entidad == null)
                 throw new Exception("lbFaltaInformacion");
             if (entidad.IdHorarioDia == 0)
                 throw new Exception("lbNoSeGuardo");
 
-            this.IConexion!.HorariosDias.Remove(entidad);
+            this.IConexion!.HorarioDias.Remove(entidad);
             this.IConexion.SaveChanges();
             return entidad;
         }

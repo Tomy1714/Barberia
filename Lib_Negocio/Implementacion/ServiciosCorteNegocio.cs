@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<ServiciosCorte> Listar()
         {
             return this.IConexion!.ServiciosCorte
-                .Include(e => e.Servicios)
+                .Include(e => e.Servicio)
                 .Take(50).ToList();
         }
 

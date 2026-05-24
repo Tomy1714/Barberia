@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Lib_Negocio.Entidades
 {
     public class Facturas
     {
-        public int      IdFactura     { get; set; }
+        [Key] public int      IdFactura     { get; set; }
         public int      IdPago        { get; set; }   // FK
         public int      IdCliente     { get; set; }   // FK
         public string   CodigoFactura { get; set; } = string.Empty;
@@ -12,7 +15,12 @@ namespace Lib_Negocio.Entidades
         public decimal  Total         { get; set; }
 
         // Navegacion
-        public Pagos?    Pago    { get; set; }
+
+
+        [ForeignKey(nameof(IdPago))]
+        public Pagos? Pago { get; set; }
+
+        [ForeignKey(nameof(IdCliente))]
         public Clientes? Cliente { get; set; }
     }
 }

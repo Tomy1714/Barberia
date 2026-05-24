@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<Pagos> Listar()
         {
             return this.IConexion!.Pagos
-                .Include(e => e.Citas)
+                .Include(e => e.Cita)
                 .Take(50).ToList();
         }
 

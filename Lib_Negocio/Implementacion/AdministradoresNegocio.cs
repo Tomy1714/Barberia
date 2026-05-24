@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<Administradores> Listar()
         {
             return this.IConexion!.Administradores
-                .Include(e => e.Empleados)
+                .Include(e => e.Empleado)
                 .Take(50).ToList();
         }
 

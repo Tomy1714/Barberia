@@ -21,8 +21,8 @@ namespace Lib_Negocio.Implementacion
         public List<Recepcionistas> Listar()
         {
             return this.IConexion!.Recepcionistas
-                .Include(e => e.Empleados)
-                .Include(e => e.Sedes)
+                .Include(e => e.Empleado)
+                .Include(e => e.Sede)
                 .Take(50).ToList();
         }
 

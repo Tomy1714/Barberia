@@ -21,9 +21,9 @@ namespace Lib_Negocio.Implementacion
         public List<Citas> Listar()
         {
             return this.IConexion!.Citas
-                .Include(e => e.Clientes)
-                .Include(e => e.Barberos)
-                .Include(e => e.Servicios)
+                .Include(e => e.Cliente)
+                .Include(e => e.Barbero)
+                .Include(e => e.Servicio)
                 .Take(50).ToList();
         }
 

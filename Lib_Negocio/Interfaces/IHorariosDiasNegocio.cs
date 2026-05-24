@@ -5,9 +5,9 @@ namespace Lib_Negocio.Interfaces
     public interface IHorariosDiasNegocio
     {
         void Configurar(string StringConexion);
-        List<HorariosDias> Listar();
-        HorariosDias? Guardar(HorariosDias? entidad);
-        HorariosDias? Modificar(HorariosDias? entidad);
-        HorariosDias? Borrar(HorariosDias? entidad);
+        List<HorarioDias> Listar();
+        HorarioDias? Guardar(HorarioDias? entidad);
+        HorarioDias? Modificar(HorarioDias? entidad);
+        HorarioDias? Borrar(HorarioDias? entidad);
     }
 }

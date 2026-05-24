@@ -21,8 +21,8 @@ namespace Lib_Negocio.Implementacion
         public List<InventarioProductos> Listar()
         {
             return this.IConexion!.InventarioProductos
-                .Include(e => e.Inventarios)
-                .Include(e => e.Productos)
+                .Include(e => e.Inventario)
+                .Include(e => e.Producto)
                 .Take(50).ToList();
         }
 

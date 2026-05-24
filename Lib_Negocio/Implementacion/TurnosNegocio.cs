@@ -21,8 +21,8 @@ namespace Lib_Negocio.Implementacion
         public List<Turnos> Listar()
         {
             return this.IConexion!.Turnos
-                .Include(e => e.Barberos)
-                .Include(e => e.Sedes)
+                .Include(e => e.Barbero)
+                .Include(e => e.Sede)
                 .Take(50).ToList();
         }
 

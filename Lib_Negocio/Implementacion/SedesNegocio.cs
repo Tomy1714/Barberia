@@ -62,7 +62,7 @@ namespace Lib_Negocio.Implementacion
 
         public bool HayPuestosDisponibles(Sedes entidad)
         {
-            int empleadosActuales = this.IConexion!.EmpleadosSedes
+            int empleadosActuales = this.IConexion!.EmpleadoSede
                 .Count(es => es.IdSede == entidad.IdSede);
             return empleadosActuales < entidad.CapacidadMaxima;
         }

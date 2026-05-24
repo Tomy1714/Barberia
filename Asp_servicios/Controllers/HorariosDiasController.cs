@@ -54,7 +54,7 @@ namespace Asp_Servicios.Controllers
 
         // POST: api/HorariosDias
         [HttpPost]
-        public IActionResult Guardar([FromBody] HorariosDias? entidad)
+        public IActionResult Guardar([FromBody] HorarioDias? entidad)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace Asp_Servicios.Controllers
 
         // PUT: api/HorariosDias
         [HttpPut]
-        public IActionResult Modificar([FromBody] HorariosDias? entidad)
+        public IActionResult Modificar([FromBody] HorarioDias? entidad)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace Asp_Servicios.Controllers
 
         // DELETE: api/HorariosDias
         [HttpDelete]
-        public IActionResult Borrar([FromBody] HorariosDias? entidad)
+        public IActionResult Borrar([FromBody] HorarioDias? entidad)
         {
             try
             {

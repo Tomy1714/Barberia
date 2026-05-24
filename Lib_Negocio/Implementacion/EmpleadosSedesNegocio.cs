@@ -18,46 +18,46 @@ namespace Lib_Negocio.Implementacion
             this.IConexion!.Database.GetConnectionString();
         }
 
-        public List<EmpleadosSedes> Listar()
+        public List<EmpleadoSede> Listar()
         {
-            return this.IConexion!.EmpleadosSedes
-                .Include(e => e.Empleados)
-                .Include(e => e.Sedes)
+            return this.IConexion!.EmpleadoSede
+                .Include(e => e.Empleado)
+                .Include(e => e.Sede)
                 .Take(50).ToList();
         }
 
-        public EmpleadosSedes? Guardar(EmpleadosSedes? entidad)
+        public EmpleadoSede? Guardar(EmpleadoSede? entidad)
         {
             if (entidad == null)
                 throw new Exception("lbFaltaInformacion");
             if (entidad.IdEmpleadoSede != 0)
                 throw new Exception("lbYaSeGuardo");
 
-            this.IConexion!.EmpleadosSedes.Add(entidad);
+            this.IConexion!.EmpleadoSede.Add(entidad);
             this.IConexion.SaveChanges();
             return entidad;
         }
 
-        public EmpleadosSedes? Modificar(EmpleadosSedes? entidad)
+        public EmpleadoSede? Modificar(EmpleadoSede? entidad)
         {
             if (entidad == null)
                 throw new Exception("lbFaltaInformacion");
             if (entidad.IdEmpleadoSede == 0)
                 throw new Exception("lbNoSeGuardo");
 
-            this.IConexion!.EmpleadosSedes.Update(entidad);
+            this.IConexion!.EmpleadoSede.Update(entidad);
             this.IConexion.SaveChanges();
             return entidad;
         }
 
-        public EmpleadosSedes? Borrar(EmpleadosSedes? entidad)
+        public EmpleadoSede? Borrar(EmpleadoSede? entidad)
         {
             if (entidad == null)
                 throw new Exception("lbFaltaInformacion");
             if (entidad.IdEmpleadoSede == 0)
                 throw new Exception("lbNoSeGuardo");
 
-            this.IConexion!.EmpleadosSedes.Remove(entidad);
+            this.IConexion!.EmpleadoSede.Remove(entidad);
             this.IConexion.SaveChanges();
             return entidad;
         }

@@ -21,8 +21,8 @@ namespace Lib_Negocio.Implementacion
         public List<Calificaciones> Listar()
         {
             return this.IConexion!.Calificaciones
-                .Include(e => e.Citas)
-                .Include(e => e.Barberos)
+                .Include(e => e.Cita)
+                .Include(e => e.Barbero)
                 .Take(50).ToList();
         }
 

@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<Horarios> Listar()
         {
             return this.IConexion!.Horarios
-                .Include(e => e.Empleados)
+                .Include(e => e.Empleado)
                 .Take(50).ToList();
         }
 

@@ -54,7 +54,7 @@ namespace Asp_Servicios.Controllers
 
         // POST: api/EmpleadosSedes
         [HttpPost]
-        public IActionResult Guardar([FromBody] EmpleadosSedes? entidad)
+        public IActionResult Guardar([FromBody] EmpleadoSede? entidad)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace Asp_Servicios.Controllers
 
         // PUT: api/EmpleadosSedes
         [HttpPut]
-        public IActionResult Modificar([FromBody] EmpleadosSedes? entidad)
+        public IActionResult Modificar([FromBody] EmpleadoSede? entidad)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace Asp_Servicios.Controllers
 
         // DELETE: api/EmpleadosSedes
         [HttpDelete]
-        public IActionResult Borrar([FromBody] EmpleadosSedes? entidad)
+        public IActionResult Borrar([FromBody] EmpleadoSede? entidad)
         {
             try
             {

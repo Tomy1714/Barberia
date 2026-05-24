@@ -416,6 +416,21 @@ CREATE TABLE ComboServicios (
 );
 GO
 
+CREATE TABLE Usuarios (
+    IdUsuario  INT           IDENTITY(1,1) PRIMARY KEY,
+    IdPersona  INT           NOT NULL,
+    Email      VARCHAR(150)  NOT NULL UNIQUE,
+    Contrasena VARCHAR(255)  NOT NULL,
+    Rol        VARCHAR(50)   NOT NULL DEFAULT 'Cliente',
+    Activo     BIT           NOT NULL DEFAULT 1,
+    FechaCreacion DATETIME   NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT FK_Usuarios_Personas FOREIGN KEY (IdPersona)
+        REFERENCES Personas(IdPersona),
+    CONSTRAINT CHK_Rol CHECK (Rol IN ('Administrador', 'Barbero', 'Cliente'))
+);
+GO
+
+
 -- ============================================================
 -- DATOS DE PRUEBA
 -- ============================================================
@@ -561,3 +576,9 @@ INSERT INTO ComboServicios (IdCombo, IdServicio)
 VALUES (1,1),(1,2);
 GO
 
+INSERT INTO Usuarios (IdPersona, Email, Contrasena, Rol)
+VALUES
+(1, 'tomasvargas@email.com',  '1234', 'Administrador'),
+(2, 'pepito@barberia.com',    '1234', 'Barbero'),
+(4, 'lolo@mail.com',          '1234', 'Cliente');
+GO

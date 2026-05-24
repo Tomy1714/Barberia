@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<Inventarios> Listar()
         {
             return this.IConexion!.Inventarios
-                .Include(e => e.Sedes)
+                .Include(e => e.Sede)
                 .Take(50).ToList();
         }
 

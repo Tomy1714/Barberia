@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Lib_Negocio.Entidades
 {
     public class Notificaciones
     {
-        public int       IdNotificacion { get; set; }
+        [Key] public int       IdNotificacion { get; set; }
         public int       IdCliente      { get; set; }   // FK
         public int       IdCita         { get; set; }   // FK
         public string    Tipo           { get; set; } = string.Empty;
@@ -13,7 +16,12 @@ namespace Lib_Negocio.Entidades
         public DateTime  FechaCreacion  { get; set; } = DateTime.Now;
 
         // Navegacion
+
+
+        [ForeignKey(nameof(IdCita))]
+        public Citas? Cita { get; set; }
+
+        [ForeignKey(nameof(IdCliente))]
         public Clientes? Cliente { get; set; }
-        public Citas?    Cita    { get; set; }
     }
 }

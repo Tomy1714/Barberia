@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<PuntosFidelidad> Listar()
         {
             return this.IConexion!.PuntosFidelidad
-                .Include(e => e.Clientes)
+                .Include(e => e.Cliente)
                 .Take(50).ToList();
         }
 

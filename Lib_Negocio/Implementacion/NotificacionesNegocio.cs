@@ -21,8 +21,8 @@ namespace Lib_Negocio.Implementacion
         public List<Notificaciones> Listar()
         {
             return this.IConexion!.Notificaciones
-                .Include(e => e.Clientes)
-                .Include(e => e.Citas)
+                .Include(e => e.Cliente)
+                .Include(e => e.Cita)
                 .Take(50).ToList();
         }
 

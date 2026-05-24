@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Lib_Negocio.Entidades
 {
     public class Productos
     {
-        public int     IdProducto   { get; set; }
+        [Key] public int     IdProducto   { get; set; }
         public string  Nombre       { get; set; } = string.Empty;
         public string  Marca        { get; set; } = string.Empty;
         public string  Categoria    { get; set; } = string.Empty;

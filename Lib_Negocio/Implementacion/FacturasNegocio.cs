@@ -21,8 +21,8 @@ namespace Lib_Negocio.Implementacion
         public List<Facturas> Listar()
         {
             return this.IConexion!.Facturas
-                .Include(e => e.Pagos)
-                .Include(e => e.Clientes)
+                .Include(e => e.Pago)
+                .Include(e => e.Cliente)
                 .Take(50).ToList();
         }
 

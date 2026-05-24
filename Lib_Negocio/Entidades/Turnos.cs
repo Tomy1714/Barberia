@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Lib_Negocio.Entidades
 {
     public class Turnos
     {
-        public int      IdTurno    { get; set; }
+        [Key] public int      IdTurno    { get; set; }
         public int      IdBarbero  { get; set; }   // FK
         public int      IdSede     { get; set; }   // FK
         public DateTime FechaTurno { get; set; }
@@ -11,7 +14,12 @@ namespace Lib_Negocio.Entidades
         public string   Estado     { get; set; } = "Programado";
 
         // Navegacion
+
+
+        [ForeignKey(nameof(IdBarbero))]
         public Barberos? Barbero { get; set; }
-        public Sedes?    Sede    { get; set; }
+
+        [ForeignKey(nameof(IdSede))]
+        public Sedes? Sede { get; set; }
     }
 }

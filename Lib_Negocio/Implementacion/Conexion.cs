@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Lib_Negocio.Entidades;
 using Lib_Negocio.Interfaces;
 
@@ -19,7 +18,7 @@ namespace Lib_Negocio.Implementacion
         public DbSet<Personas>             Personas             { get; set; }
         public DbSet<Clientes>             Clientes             { get; set; }
         public DbSet<Empleados>            Empleados            { get; set; }
-        public DbSet<Barberos>             Barberos             { get; set; }
+        public DbSet<Barberos>             Barberos            { get; set; }
         public DbSet<Recepcionistas>       Recepcionistas       { get; set; }
         public DbSet<Administradores>      Administradores      { get; set; }
         public DbSet<Sedes>                Sedes                { get; set; }
@@ -32,7 +31,7 @@ namespace Lib_Negocio.Implementacion
         public DbSet<InventarioProductos>  InventarioProductos  { get; set; }
         public DbSet<Turnos>               Turnos               { get; set; }
         public DbSet<Horarios>             Horarios             { get; set; }
-        public DbSet<HorariosDias>         HorariosDias         { get; set; }
+        public DbSet<HorarioDias>         HorarioDias         { get; set; }
         public DbSet<Citas>                Citas                { get; set; }
         public DbSet<Pagos>                Pagos                { get; set; }
         public DbSet<Facturas>             Facturas             { get; set; }
@@ -40,7 +39,8 @@ namespace Lib_Negocio.Implementacion
         public DbSet<Promociones>          Promociones          { get; set; }
         public DbSet<Notificaciones>       Notificaciones       { get; set; }
         public DbSet<PuntosFidelidad>      PuntosFidelidad      { get; set; }
-        public DbSet<EmpleadosSedes>       EmpleadosSedes       { get; set; }
+        public DbSet<EmpleadoSede>       EmpleadoSede     { get; set; }
         public DbSet<ComboServicios>       ComboServicios       { get; set; }
+        public DbSet<Usuarios>             Usuarios             { get; set; }
     }
 }

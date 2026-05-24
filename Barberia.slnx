@@ -1,5 +1,9 @@
 <Solution>
+  <Folder Name="/Pruebas Unitarias/">
+    <Project Path="Test_Unitarias/Test_Unitarias.csproj" Id="98139b62-8eeb-45e4-b571-570e23e5aee6" />
+  </Folder>
   <Folder Name="/Servicios/">
+    <Project Path="Asp_servicios/Asp_servicios.csproj" Id="1fe04a05-5dde-4fbc-a564-6a8163aa76bb" />
     <Project Path="Lib_Negocio/Lib_Negocio.csproj" />
   </Folder>
 </Solution>

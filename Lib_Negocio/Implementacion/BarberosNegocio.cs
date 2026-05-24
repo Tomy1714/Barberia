@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<Barberos> Listar()
         {
             return this.IConexion!.Barberos
-                .Include(e => e.Empleados)
+                .Include(e => e.Empleado)
                 .Take(50).ToList();
         }
 

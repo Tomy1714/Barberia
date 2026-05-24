@@ -21,7 +21,7 @@ namespace Lib_Negocio.Implementacion
         public List<Combos> Listar()
         {
             return this.IConexion!.Combos
-                .Include(e => e.Servicios)
+                .Include(e => e.Servicio)
                 .Take(50).ToList();
         }
 
