@@ -42,5 +42,34 @@ namespace Lib_Negocio.Implementacion
         public DbSet<EmpleadoSede>       EmpleadoSede     { get; set; }
         public DbSet<ComboServicios>       ComboServicios       { get; set; }
         public DbSet<Usuarios>             Usuarios             { get; set; }
+
+        public DbSet<PersonasAuditoria> PersonasAuditoria { get; set; }
+        public DbSet<ClientesAuditoria> ClientesAuditoria { get; set; }
+        public DbSet<EmpleadosAuditoria> EmpleadosAuditoria { get; set; }
+        public DbSet<BarberosAuditoria> BarberosAuditoria { get; set; }
+        public DbSet<RecepcionistasAuditoria> RecepcionistasAuditoria { get; set; }
+        public DbSet<AdministradoresAuditoria> AdministradoresAuditoria { get; set; }
+        public DbSet<SedesAuditoria> SedesAuditoria { get; set; }
+        public DbSet<ServiciosAuditoria> ServiciosAuditoria { get; set; }
+        public DbSet<ServiciosCorteAuditoria> ServiciosCorteAuditoria { get; set; }
+        public DbSet<ServiciosTratamientoAuditoria> ServiciosTratamientoAuditoria { get; set; }
+        public DbSet<CombosAuditoria> CombosAuditoria { get; set; }
+        public DbSet<ProductosAuditoria> ProductosAuditoria { get; set; }
+        public DbSet<InventariosAuditoria> InventariosAuditoria { get; set; }
+        public DbSet<InventarioProductosAuditoria> InventarioProductosAuditoria { get; set; }
+        public DbSet<TurnosAuditoria> TurnosAuditoria { get; set; }
+        public DbSet<HorariosAuditoria> HorariosAuditoria { get; set; }
+        public DbSet<HorariosDiasAuditoria> HorariosDiasAuditoria { get; set; }
+        public DbSet<CitasAuditoria> CitasAuditoria { get; set; }
+        public DbSet<PagosAuditoria> PagosAuditoria { get; set; }
+        public DbSet<FacturasAuditoria> FacturasAuditoria { get; set; }
+        public DbSet<CalificacionesAuditoria> CalificacionesAuditoria { get; set; }
+        public DbSet<PromocionesAuditoria> PromocionesAuditoria { get; set; }
+        public DbSet<NotificacionesAuditoria> NotificacionesAuditoria { get; set; }
+        public DbSet<PuntosFidelidadAuditoria> PuntosFidelidadAuditoria { get; set; }
+        public DbSet<EmpleadosSedesAuditoria> EmpleadosSedesAuditoria { get; set; }
+        public DbSet<ComboServiciosAuditoria> ComboServiciosAuditoria { get; set; }
+        public DbSet<UsuariosAuditoria> UsuariosAuditoria { get; set; }
+
     }
 }

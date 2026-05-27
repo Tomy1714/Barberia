@@ -25,6 +25,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<BarberosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.BarberosAuditoria
+                .Take(50).ToList();
+        }
+
         public Barberos? Guardar(Barberos? entidad)
         {
             if (entidad == null)
@@ -33,6 +39,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Barberos.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.BarberosAuditoria.Add(new BarberosAuditoria
+            {
+                IdBarbero = entidad.IdBarbero,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -46,6 +60,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Barberos.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.BarberosAuditoria.Add(new BarberosAuditoria
+            {
+                IdBarbero = entidad.IdBarbero,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -57,6 +79,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Barberos.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.BarberosAuditoria.Add(new BarberosAuditoria
+            {
+                IdBarbero = entidad.IdBarbero,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

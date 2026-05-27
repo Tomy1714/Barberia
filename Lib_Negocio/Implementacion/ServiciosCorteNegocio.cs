@@ -25,6 +25,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<ServiciosCorteAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.ServiciosCorteAuditoria
+                .Take(50).ToList();
+        }
+
         public ServiciosCorte? Guardar(ServiciosCorte? entidad)
         {
             if (entidad == null)
@@ -33,6 +39,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.ServiciosCorte.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.ServiciosCorteAuditoria.Add(new ServiciosCorteAuditoria
+            {
+                IdServicioCorte = entidad.IdServicioCorte,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -46,6 +60,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.ServiciosCorte.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.ServiciosCorteAuditoria.Add(new ServiciosCorteAuditoria
+            {
+                IdServicioCorte = entidad.IdServicioCorte,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -57,6 +79,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.ServiciosCorte.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.ServiciosCorteAuditoria.Add(new ServiciosCorteAuditoria
+            {
+                IdServicioCorte = entidad.IdServicioCorte,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

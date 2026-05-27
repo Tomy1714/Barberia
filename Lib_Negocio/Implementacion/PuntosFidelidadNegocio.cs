@@ -25,6 +25,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<PuntosFidelidadAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.PuntosFidelidadAuditoria
+                .Take(50).ToList();
+        }
+
         public PuntosFidelidad? Guardar(PuntosFidelidad? entidad)
         {
             if (entidad == null)
@@ -33,6 +39,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.PuntosFidelidad.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.PuntosFidelidadAuditoria.Add(new PuntosFidelidadAuditoria
+            {
+                IdPuntos = entidad.IdPuntos,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -46,6 +60,15 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.PuntosFidelidad.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.PuntosFidelidadAuditoria.Add(new PuntosFidelidadAuditoria
+            {
+                IdPuntos = entidad.IdPuntos,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
+
             return entidad;
         }
 
@@ -57,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.PuntosFidelidad.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.PuntosFidelidadAuditoria.Add(new PuntosFidelidadAuditoria
+            {
+                IdPuntos = entidad.IdPuntos,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

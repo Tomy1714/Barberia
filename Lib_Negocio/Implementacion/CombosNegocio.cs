@@ -25,6 +25,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<CombosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.CombosAuditoria
+                .Take(50).ToList();
+        }
+
         public Combos? Guardar(Combos? entidad)
         {
             if (entidad == null)
@@ -33,6 +39,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Combos.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.CombosAuditoria.Add(new CombosAuditoria
+            {
+                IdCombo = entidad.IdCombo,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -46,6 +60,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Combos.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.CombosAuditoria.Add(new CombosAuditoria
+            {
+                IdCombo = entidad.IdCombo,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -57,6 +79,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Combos.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.CombosAuditoria.Add(new CombosAuditoria
+            {
+                IdCombo = entidad.IdCombo,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

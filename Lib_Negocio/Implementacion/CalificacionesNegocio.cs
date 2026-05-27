@@ -26,6 +26,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<CalificacionesAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.CalificacionesAuditoria
+                .Take(50).ToList();
+        }
+
         public Calificaciones? Guardar(Calificaciones? entidad)
         {
             if (entidad == null)
@@ -34,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Calificaciones.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.CalificacionesAuditoria.Add(new CalificacionesAuditoria
+            {
+                IdCalificacion = entidad.IdCalificacion,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Calificaciones.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.CalificacionesAuditoria.Add(new CalificacionesAuditoria
+            {
+                IdCalificacion = entidad.IdCalificacion,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Calificaciones.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.CalificacionesAuditoria.Add(new CalificacionesAuditoria
+            {
+                IdCalificacion = entidad.IdCalificacion,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

@@ -38,6 +38,35 @@ namespace Lib_Negocio.Interfaces
 
         DbSet<Usuarios> Usuarios { get; set; }
 
+        DbSet<PersonasAuditoria> PersonasAuditoria { get; set; }
+        DbSet<ClientesAuditoria> ClientesAuditoria { get; set; }
+        DbSet<EmpleadosAuditoria> EmpleadosAuditoria { get; set; }
+        DbSet<BarberosAuditoria> BarberosAuditoria { get; set; }
+        DbSet<RecepcionistasAuditoria> RecepcionistasAuditoria { get; set; }
+        DbSet<AdministradoresAuditoria> AdministradoresAuditoria { get; set; }
+        DbSet<SedesAuditoria> SedesAuditoria { get; set; }
+        DbSet<ServiciosAuditoria> ServiciosAuditoria { get; set; }
+        DbSet<ServiciosCorteAuditoria> ServiciosCorteAuditoria { get; set; }
+        DbSet<ServiciosTratamientoAuditoria> ServiciosTratamientoAuditoria { get; set; }
+        DbSet<CombosAuditoria> CombosAuditoria { get; set; }
+        DbSet<ProductosAuditoria> ProductosAuditoria { get; set; }
+        DbSet<InventariosAuditoria> InventariosAuditoria { get; set; }
+        DbSet<InventarioProductosAuditoria> InventarioProductosAuditoria { get; set; }
+        DbSet<TurnosAuditoria> TurnosAuditoria { get; set; }
+        DbSet<HorariosAuditoria> HorariosAuditoria { get; set; }
+        DbSet<HorariosDiasAuditoria> HorariosDiasAuditoria { get; set; }
+        DbSet<CitasAuditoria> CitasAuditoria { get; set; }
+        DbSet<PagosAuditoria> PagosAuditoria { get; set; }
+        DbSet<FacturasAuditoria> FacturasAuditoria { get; set; }
+        DbSet<CalificacionesAuditoria> CalificacionesAuditoria { get; set; }
+        DbSet<PromocionesAuditoria> PromocionesAuditoria { get; set; }
+        DbSet<NotificacionesAuditoria> NotificacionesAuditoria { get; set; }
+        DbSet<PuntosFidelidadAuditoria> PuntosFidelidadAuditoria { get; set; }
+        DbSet<EmpleadosSedesAuditoria> EmpleadosSedesAuditoria { get; set; }
+        DbSet<ComboServiciosAuditoria> ComboServiciosAuditoria { get; set; }
+        DbSet<UsuariosAuditoria> UsuariosAuditoria { get; set; }
+
+
         EntityEntry<T> Entry<T>(T entity) where T : class;
         int SaveChanges();
     }

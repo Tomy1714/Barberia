@@ -26,6 +26,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<FacturasAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.FacturasAuditoria
+                .Take(50).ToList();
+        }
+
         public Facturas? Guardar(Facturas? entidad)
         {
             if (entidad == null)
@@ -34,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Facturas.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.FacturasAuditoria.Add(new FacturasAuditoria
+            {
+                IdFactura = entidad.IdFactura,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Facturas.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.FacturasAuditoria.Add(new FacturasAuditoria
+            {
+                IdFactura = entidad.IdFactura,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Facturas.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.FacturasAuditoria.Add(new FacturasAuditoria
+            {
+                IdFactura = entidad.IdFactura,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

@@ -26,6 +26,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<NotificacionesAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.NotificacionesAuditoria
+                .Take(50).ToList();
+        }
+
         public Notificaciones? Guardar(Notificaciones? entidad)
         {
             if (entidad == null)
@@ -34,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Notificaciones.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.NotificacionesAuditoria.Add(new NotificacionesAuditoria
+            {
+                IdNotificacion = entidad.IdNotificacion,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Notificaciones.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.NotificacionesAuditoria.Add(new NotificacionesAuditoria
+            {
+                IdNotificacion = entidad.IdNotificacion,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Notificaciones.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.NotificacionesAuditoria.Add(new NotificacionesAuditoria
+            {
+                IdNotificacion = entidad.IdNotificacion,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

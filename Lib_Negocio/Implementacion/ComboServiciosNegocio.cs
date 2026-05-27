@@ -26,6 +26,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<ComboServiciosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.ComboServiciosAuditoria
+                .Take(50).ToList();
+        }
+
         public ComboServicios? Guardar(ComboServicios? entidad)
         {
             if (entidad == null)
@@ -34,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.ComboServicios.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.ComboServiciosAuditoria.Add(new ComboServiciosAuditoria
+            {
+                IdComboServicio = entidad.IdComboServicio,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.ComboServicios.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.ComboServiciosAuditoria.Add(new ComboServiciosAuditoria
+            {
+                IdComboServicio = entidad.IdComboServicio,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.ComboServicios.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.ComboServiciosAuditoria.Add(new ComboServiciosAuditoria
+            {
+                IdComboServicio = entidad.IdComboServicio,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

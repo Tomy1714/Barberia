@@ -26,6 +26,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<InventarioProductosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.InventarioProductosAuditoria
+                .Take(50).ToList();
+        }
+
         public InventarioProductos? Guardar(InventarioProductos? entidad)
         {
             if (entidad == null)
@@ -34,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.InventarioProductos.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.InventarioProductosAuditoria.Add(new InventarioProductosAuditoria
+            {
+                IdInventarioProducto = entidad.IdInventarioProducto,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.InventarioProductos.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.InventarioProductosAuditoria.Add(new InventarioProductosAuditoria
+            {
+                IdInventarioProducto = entidad.IdInventarioProducto,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.InventarioProductos.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.InventarioProductosAuditoria.Add(new InventarioProductosAuditoria
+            {
+                IdInventarioProducto = entidad.IdInventarioProducto,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

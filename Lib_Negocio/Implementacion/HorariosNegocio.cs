@@ -25,6 +25,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<HorariosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.HorariosAuditoria
+                .Take(50).ToList();
+        }
+
         public Horarios? Guardar(Horarios? entidad)
         {
             if (entidad == null)
@@ -33,6 +39,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Horarios.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.HorariosAuditoria.Add(new HorariosAuditoria
+            {
+                IdHorario = entidad.IdHorario,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -46,6 +60,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Horarios.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.HorariosAuditoria.Add(new HorariosAuditoria
+            {
+                IdHorario = entidad.IdHorario,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -57,6 +79,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Horarios.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.HorariosAuditoria.Add(new HorariosAuditoria
+            {
+                IdHorario = entidad.IdHorario,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

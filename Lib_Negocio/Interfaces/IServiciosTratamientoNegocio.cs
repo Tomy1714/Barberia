@@ -6,6 +6,7 @@ namespace Lib_Negocio.Interfaces
     {
         void Configurar(string StringConexion);
         List<ServiciosTratamiento> Listar();
+        List<ServiciosTratamientoAuditoria> ListarAuditoria();
         ServiciosTratamiento? Guardar(ServiciosTratamiento? entidad);
         ServiciosTratamiento? Modificar(ServiciosTratamiento? entidad);
         ServiciosTratamiento? Borrar(ServiciosTratamiento? entidad);

@@ -582,3 +582,223 @@ VALUES
 (2, 'pepito@barberia.com',    '1234', 'Barbero'),
 (4, 'lolo@mail.com',          '1234', 'Cliente');
 GO
+
+
+
+
+
+CREATE TABLE PersonasAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdPersona                      INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE ClientesAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdCliente                      INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE EmpleadosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdEmpleado                     INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE BarberosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdBarbero                      INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE RecepcionistasAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdRecepcionista                INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE AdministradoresAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdAdministrador                INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE SedesAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdSede                         INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE ServiciosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdServicio                     INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE ServiciosCorteAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdServicioCorte                INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE ServiciosTratamientoAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdServicioTratamiento          INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE CombosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdCombo                        INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE ProductosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdProducto                     INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE InventariosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdInventario                   INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE InventarioProductosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdInventarioProducto           INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE TurnosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdTurno                        INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE HorariosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdHorario                      INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE HorariosDiasAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdHorarioDia                   INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE CitasAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdCita                         INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE PagosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdPago                         INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE FacturasAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdFactura                      INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE CalificacionesAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdCalificacion                 INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE PromocionesAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdPromocion                    INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE NotificacionesAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdNotificacion                 INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE PuntosFidelidadAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdPuntos                       INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE EmpleadosSedesAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdEmpleadoSede                 INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE ComboServiciosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdComboServicio                INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE UsuariosAuditoria (
+    IdAuditoria  INT          IDENTITY(1,1) PRIMARY KEY,
+    IdUsuario                      INT          NOT NULL,
+    Accion       VARCHAR(20)  NOT NULL,
+    Fecha        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+GO

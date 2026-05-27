@@ -26,6 +26,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<EmpleadosSedesAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.EmpleadosSedesAuditoria
+                .Take(50).ToList();
+        }
+
         public EmpleadoSede? Guardar(EmpleadoSede? entidad)
         {
             if (entidad == null)
@@ -34,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.EmpleadoSede.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.EmpleadosSedesAuditoria.Add(new EmpleadosSedesAuditoria
+            {
+                IdEmpleadoSede = entidad.IdEmpleadoSede,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.EmpleadoSede.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.EmpleadosSedesAuditoria.Add(new EmpleadosSedesAuditoria
+            {
+                IdEmpleadoSede = entidad.IdEmpleadoSede,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.EmpleadoSede.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.EmpleadosSedesAuditoria.Add(new EmpleadosSedesAuditoria
+            {
+                IdEmpleadoSede = entidad.IdEmpleadoSede,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

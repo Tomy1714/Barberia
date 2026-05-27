@@ -24,6 +24,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<PersonasAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.PersonasAuditoria
+                .Take(50).ToList();
+        }
+
         public Personas? Guardar(Personas? entidad)
         {
             if (entidad == null)
@@ -32,6 +38,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Personas.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.PersonasAuditoria.Add(new PersonasAuditoria
+            {
+                IdPersona = entidad.IdPersona,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -45,6 +59,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Personas.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.PersonasAuditoria.Add(new PersonasAuditoria
+            {
+                IdPersona = entidad.IdPersona,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -56,6 +78,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Personas.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.PersonasAuditoria.Add(new PersonasAuditoria
+            {
+                IdPersona = entidad.IdPersona,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

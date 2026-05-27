@@ -25,6 +25,13 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<PromocionesAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.PromocionesAuditoria
+                .Take(50).ToList();
+        }
+
+
         public Promociones? Guardar(Promociones? entidad)
         {
             if (entidad == null)
@@ -33,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Promociones.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.PromocionesAuditoria.Add(new PromocionesAuditoria
+            {
+                IdPromocion = entidad.IdPromocion,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -46,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Promociones.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.PromocionesAuditoria.Add(new PromocionesAuditoria
+            {
+                IdPromocion = entidad.IdPromocion,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -57,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Promociones.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.PromocionesAuditoria.Add(new PromocionesAuditoria
+            {
+                IdPromocion = entidad.IdPromocion,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

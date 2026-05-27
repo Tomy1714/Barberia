@@ -25,6 +25,13 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+
+        public List<ServiciosTratamientoAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.ServiciosTratamientoAuditoria
+                .Take(50).ToList();
+        }
+
         public ServiciosTratamiento? Guardar(ServiciosTratamiento? entidad)
         {
             if (entidad == null)
@@ -34,8 +41,20 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.ServiciosTratamiento.Add(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion.ServiciosTratamientoAuditoria.Add(new ServiciosTratamientoAuditoria
+            {
+                IdServicioTratamiento = entidad.IdServicioTratamiento,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
+
             return entidad;
         }
+
+           
+        
 
         public ServiciosTratamiento? Modificar(ServiciosTratamiento? entidad)
         {
@@ -46,6 +65,16 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.ServiciosTratamiento.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.ServiciosTratamientoAuditoria.Add(new ServiciosTratamientoAuditoria
+            {
+                IdServicioTratamiento = entidad.IdServicioTratamiento,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
+
+
             return entidad;
         }
 
@@ -58,6 +87,15 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.ServiciosTratamiento.Remove(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.ServiciosTratamientoAuditoria.Add(new ServiciosTratamientoAuditoria
+            {
+                IdServicioTratamiento = entidad.IdServicioTratamiento,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
+
             return entidad;
         }
 
@@ -67,3 +105,6 @@ namespace Lib_Negocio.Implementacion
         }
     }
 }
+
+
+

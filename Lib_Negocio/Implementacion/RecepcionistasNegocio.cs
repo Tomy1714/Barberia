@@ -26,6 +26,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<RecepcionistasAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.RecepcionistasAuditoria
+                .Take(50).ToList();
+        }
+
         public Recepcionistas? Guardar(Recepcionistas? entidad)
         {
             if (entidad == null)
@@ -34,6 +40,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Recepcionistas.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.RecepcionistasAuditoria.Add(new RecepcionistasAuditoria
+            {
+                IdRecepcionista = entidad.IdRecepcionista,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +61,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Recepcionistas.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.RecepcionistasAuditoria.Add(new RecepcionistasAuditoria
+            {
+                IdRecepcionista = entidad.IdRecepcionista,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +80,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Recepcionistas.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.RecepcionistasAuditoria.Add(new RecepcionistasAuditoria
+            {
+                IdRecepcionista = entidad.IdRecepcionista,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

@@ -1,4 +1,4 @@
-using Lib_Negocio.Entidades;
+ using Lib_Negocio.Entidades;
 using Lib_Negocio.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +24,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<ProductosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.ProductosAuditoria
+                .Take(50).ToList();
+        }
+
         public Productos? Guardar(Productos? entidad)
         {
             if (entidad == null)
@@ -32,6 +38,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Productos.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.ProductosAuditoria.Add(new ProductosAuditoria
+            {
+                IdProducto = entidad.IdProducto,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -45,6 +59,15 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Productos.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.ProductosAuditoria.Add(new ProductosAuditoria
+            {
+                IdProducto = entidad.IdProducto,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
+
             return entidad;
         }
 
@@ -57,6 +80,15 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Productos.Remove(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.ProductosAuditoria.Add(new ProductosAuditoria
+            {
+                IdProducto = entidad.IdProducto,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
+
             return entidad;
         }
 

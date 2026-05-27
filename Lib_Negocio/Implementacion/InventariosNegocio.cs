@@ -25,6 +25,12 @@ namespace Lib_Negocio.Implementacion
                 .Take(50).ToList();
         }
 
+        public List<InventariosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.InventariosAuditoria
+                .Take(50).ToList();
+        }
+
         public Inventarios? Guardar(Inventarios? entidad)
         {
             if (entidad == null)
@@ -33,6 +39,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Inventarios.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.InventariosAuditoria.Add(new InventariosAuditoria
+            {
+                IdInventario = entidad.IdInventario,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -46,6 +60,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Inventarios.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.InventariosAuditoria.Add(new InventariosAuditoria
+            {
+                IdInventario = entidad.IdInventario,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -57,6 +79,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Inventarios.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.InventariosAuditoria.Add(new InventariosAuditoria
+            {
+                IdInventario = entidad.IdInventario,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }

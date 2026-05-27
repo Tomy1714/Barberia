@@ -25,7 +25,11 @@ namespace Lib_Negocio.Implementacion
                 .Include(e => e.Sede)
                 .Take(50).ToList();
         }
-
+        public List<TurnosAuditoria> ListarAuditoria()
+        {
+            return this.IConexion!.TurnosAuditoria
+                .Take(50).ToList();
+        }
         public Turnos? Guardar(Turnos? entidad)
         {
             if (entidad == null)
@@ -34,6 +38,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbYaSeGuardo");
 
             this.IConexion!.Turnos.Add(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.TurnosAuditoria.Add(new TurnosAuditoria
+            {
+                IdTurno = entidad.IdTurno,
+                Accion = "Insertar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
@@ -47,6 +59,14 @@ namespace Lib_Negocio.Implementacion
 
             this.IConexion!.Turnos.Update(entidad);
             this.IConexion.SaveChanges();
+
+            this.IConexion!.TurnosAuditoria.Add(new TurnosAuditoria
+            {
+                IdTurno = entidad.IdTurno,
+                Accion = "Modificar",
+                Fecha = DateTime.Now
+            });
+            this.IConexion.SaveChanges();
             return entidad;
         }
 
@@ -58,6 +78,14 @@ namespace Lib_Negocio.Implementacion
                 throw new Exception("lbNoSeGuardo");
 
             this.IConexion!.Turnos.Remove(entidad);
+            this.IConexion.SaveChanges();
+
+            this.IConexion!.TurnosAuditoria.Add(new TurnosAuditoria
+            {
+                IdTurno = entidad.IdTurno,
+                Accion = "Borrar",
+                Fecha = DateTime.Now
+            });
             this.IConexion.SaveChanges();
             return entidad;
         }
