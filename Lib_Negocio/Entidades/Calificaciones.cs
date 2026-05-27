@@ -6,8 +6,8 @@ namespace Lib_Negocio.Entidades
     public class Calificaciones
     {
         [Key] public int      IdCalificacion    { get; set; }
-        public int      IdCita            { get; set; }   // FK
-        public int      IdBarbero         { get; set; }   // FK
+        public int      IdCita            { get; set; }   
+        public int      IdBarbero         { get; set; }   
         public int      Puntaje           { get; set; }
         public string   Comentario        { get; set; } = string.Empty;
         public DateTime FechaCalificacion { get; set; } = DateTime.Now;
