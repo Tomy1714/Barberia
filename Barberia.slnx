@@ -1,5 +1,8 @@
 <Solution>
-  <Folder Name="/Presentaciones/" />
+  <Folder Name="/Presentaciones/">
+    <Project Path="Asp_Presentaciones/Asp_Presentaciones.csproj" Id="8ef59108-bd0f-4673-800c-858681f073d7" />
+    <Project Path="Lib_Presentaciones/Lib_Presentaciones.csproj" Id="51047082-95aa-4c66-8e6b-810f3c41992b" />
+  </Folder>
   <Folder Name="/Pruebas Unitarias/">
     <Project Path="Test_Unitarias/Test_Unitarias.csproj" Id="98139b62-8eeb-45e4-b571-570e23e5aee6" />
   </Folder>
