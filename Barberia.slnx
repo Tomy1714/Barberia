@@ -1,4 +1,5 @@
 <Solution>
+  <Folder Name="/Presentaciones/" />
   <Folder Name="/Pruebas Unitarias/">
     <Project Path="Test_Unitarias/Test_Unitarias.csproj" Id="98139b62-8eeb-45e4-b571-570e23e5aee6" />
   </Folder>

@@ -1,8 +1,4 @@
--- ============================================================
--- SCRIPT SQL - SISTEMA DE GESTION DE BARBERIA
--- Motor: SQL Server (SSMS)
--- Todas las PKs con IDENTITY(1,1)
--- ============================================================
+
 
 CREATE DATABASE Barberia;
 GO
@@ -10,9 +6,7 @@ GO
 USE Barberia;
 GO
 
--- ============================================================
--- TABLA: Personas (base de Clientes y Empleados)
--- ============================================================
+
 CREATE TABLE Personas (
     IdPersona      INT           IDENTITY(1,1) PRIMARY KEY,
     Identificacion VARCHAR(20)   NOT NULL UNIQUE,
@@ -26,9 +20,7 @@ CREATE TABLE Personas (
 );
 GO
 
--- ============================================================
--- TABLA: Clientes (hereda de Personas)
--- ============================================================
+
 CREATE TABLE Clientes (
     IdCliente    INT      IDENTITY(1,1) PRIMARY KEY,
     IdPersona    INT      NOT NULL,
@@ -39,9 +31,7 @@ CREATE TABLE Clientes (
 );
 GO
 
--- ============================================================
--- TABLA: Empleados (hereda de Personas)
--- ============================================================
+
 CREATE TABLE Empleados (
     IdEmpleado  INT            IDENTITY(1,1) PRIMARY KEY,
     IdPersona   INT            NOT NULL,
@@ -54,9 +44,7 @@ CREATE TABLE Empleados (
 );
 GO
 
--- ============================================================
--- TABLA: Sedes
--- ============================================================
+
 CREATE TABLE Sedes (
     IdSede          INT           IDENTITY(1,1) PRIMARY KEY,
     Nombre          VARCHAR(150)  NOT NULL,
@@ -70,9 +58,7 @@ CREATE TABLE Sedes (
 );
 GO
 
--- ============================================================
--- TABLA: Barberos (hereda de Empleados)
--- ============================================================
+
 CREATE TABLE Barberos (
     IdBarbero          INT            IDENTITY(1,1) PRIMARY KEY,
     IdEmpleado         INT            NOT NULL,
@@ -86,9 +72,7 @@ CREATE TABLE Barberos (
 );
 GO
 
--- ============================================================
--- TABLA: Recepcionistas (hereda de Empleados)
--- ============================================================
+
 CREATE TABLE Recepcionistas (
     IdRecepcionista     INT           IDENTITY(1,1) PRIMARY KEY,
     IdEmpleado          INT           NOT NULL,
@@ -103,9 +87,7 @@ CREATE TABLE Recepcionistas (
 );
 GO
 
--- ============================================================
--- TABLA: Administradores (hereda de Empleados)
--- ============================================================
+
 CREATE TABLE Administradores (
     IdAdministrador      INT            IDENTITY(1,1) PRIMARY KEY,
     IdEmpleado           INT            NOT NULL,
@@ -118,9 +100,7 @@ CREATE TABLE Administradores (
 );
 GO
 
--- ============================================================
--- TABLA: Servicios (base de ServiciosCorte, Tratamiento, Combo)
--- ============================================================
+
 CREATE TABLE Servicios (
     IdServicio      INT            IDENTITY(1,1) PRIMARY KEY,
     Nombre          VARCHAR(150)   NOT NULL,
@@ -131,9 +111,7 @@ CREATE TABLE Servicios (
 );
 GO
 
--- ============================================================
--- TABLA: ServiciosCorte (hereda de Servicios)
--- ============================================================
+
 CREATE TABLE ServiciosCorte (
     IdServicioCorte    INT           IDENTITY(1,1) PRIMARY KEY,
     IdServicio         INT           NOT NULL,
@@ -146,9 +124,7 @@ CREATE TABLE ServiciosCorte (
 );
 GO
 
--- ============================================================
--- TABLA: ServiciosTratamiento (hereda de Servicios)
--- ============================================================
+
 CREATE TABLE ServiciosTratamiento (
     IdServicioTratamiento INT           IDENTITY(1,1) PRIMARY KEY,
     IdServicio            INT           NOT NULL,
@@ -160,9 +136,7 @@ CREATE TABLE ServiciosTratamiento (
 );
 GO
 
--- ============================================================
--- TABLA: Combos (hereda de Servicios)
--- ============================================================
+
 CREATE TABLE Combos (
     IdCombo        INT           IDENTITY(1,1) PRIMARY KEY,
     IdServicio     INT           NOT NULL,
@@ -173,9 +147,7 @@ CREATE TABLE Combos (
 );
 GO
 
--- ============================================================
--- TABLA: Productos
--- ============================================================
+
 CREATE TABLE Productos (
     IdProducto   INT            IDENTITY(1,1) PRIMARY KEY,
     Nombre       VARCHAR(150)   NOT NULL,
@@ -188,9 +160,7 @@ CREATE TABLE Productos (
 );
 GO
 
--- ============================================================
--- TABLA: Inventarios
--- ============================================================
+
 CREATE TABLE Inventarios (
     IdInventario INT  IDENTITY(1,1) PRIMARY KEY,
     IdSede       INT  NOT NULL,
@@ -201,9 +171,7 @@ CREATE TABLE Inventarios (
 );
 GO
 
--- ============================================================
--- TABLA: InventarioProductos (tabla intermedia)
--- ============================================================
+
 CREATE TABLE InventarioProductos (
     IdInventarioProducto INT IDENTITY(1,1) PRIMARY KEY,
     IdInventario         INT NOT NULL,
@@ -216,9 +184,7 @@ CREATE TABLE InventarioProductos (
 );
 GO
 
--- ============================================================
--- TABLA: Horarios
--- ============================================================
+
 CREATE TABLE Horarios (
     IdHorario   INT  IDENTITY(1,1) PRIMARY KEY,
     IdEmpleado  INT  NOT NULL,
@@ -230,9 +196,7 @@ CREATE TABLE Horarios (
 );
 GO
 
--- ============================================================
--- TABLA: HorarioDias (dias laborales del horario)
--- ============================================================
+
 CREATE TABLE HorarioDias (
     IdHorarioDia INT          IDENTITY(1,1) PRIMARY KEY,
     IdHorario    INT          NOT NULL,
@@ -242,9 +206,7 @@ CREATE TABLE HorarioDias (
 );
 GO
 
--- ============================================================
--- TABLA: Turnos
--- ============================================================
+
 CREATE TABLE Turnos (
     IdTurno    INT          IDENTITY(1,1) PRIMARY KEY,
     IdBarbero  INT          NOT NULL,
@@ -260,9 +222,7 @@ CREATE TABLE Turnos (
 );
 GO
 
--- ============================================================
--- TABLA: Citas
--- ============================================================
+
 CREATE TABLE Citas (
     IdCita          INT           IDENTITY(1,1) PRIMARY KEY,
     IdCliente       INT           NOT NULL,
@@ -281,9 +241,7 @@ CREATE TABLE Citas (
 );
 GO
 
--- ============================================================
--- TABLA: Pagos (implementa logica de IMetodoPago)
--- ============================================================
+
 CREATE TABLE Pagos (
     IdPago       INT           IDENTITY(1,1) PRIMARY KEY,
     IdCita       INT           NOT NULL,
@@ -299,9 +257,7 @@ CREATE TABLE Pagos (
 );
 GO
 
--- ============================================================
--- TABLA: Facturas
--- ============================================================
+
 CREATE TABLE Facturas (
     IdFactura    INT           IDENTITY(1,1) PRIMARY KEY,
     IdPago       INT           NOT NULL,
@@ -318,9 +274,7 @@ CREATE TABLE Facturas (
 );
 GO
 
--- ============================================================
--- TABLA: Calificaciones
--- ============================================================
+
 CREATE TABLE Calificaciones (
     IdCalificacion INT           IDENTITY(1,1) PRIMARY KEY,
     IdCita         INT           NOT NULL,
@@ -336,9 +290,7 @@ CREATE TABLE Calificaciones (
 );
 GO
 
--- ============================================================
--- TABLA: Promociones
--- ============================================================
+
 CREATE TABLE Promociones (
     IdPromocion         INT           IDENTITY(1,1) PRIMARY KEY,
     IdServicio          INT           NOT NULL,
@@ -353,9 +305,7 @@ CREATE TABLE Promociones (
 );
 GO
 
--- ============================================================
--- TABLA: Notificaciones
--- ============================================================
+
 CREATE TABLE Notificaciones (
     IdNotificacion INT          IDENTITY(1,1) PRIMARY KEY,
     IdCliente      INT          NOT NULL,
@@ -373,9 +323,7 @@ CREATE TABLE Notificaciones (
 );
 GO
 
--- ============================================================
--- TABLA: PuntosFidelidad
--- ============================================================
+
 CREATE TABLE PuntosFidelidad (
     IdPuntos         INT           IDENTITY(1,1) PRIMARY KEY,
     IdCliente        INT           NOT NULL UNIQUE,
@@ -387,9 +335,7 @@ CREATE TABLE PuntosFidelidad (
 );
 GO
 
--- ============================================================
--- TABLA: EmpleadoSede (relacion empleados con sedes)
--- ============================================================
+
 CREATE TABLE EmpleadoSede (
     IdEmpleadoSede INT  IDENTITY(1,1) PRIMARY KEY,
     IdEmpleado     INT  NOT NULL,
@@ -402,9 +348,7 @@ CREATE TABLE EmpleadoSede (
 );
 GO
 
--- ============================================================
--- TABLA: ComboServicios (servicios incluidos en un combo)
--- ============================================================
+
 CREATE TABLE ComboServicios (
     IdComboServicio INT IDENTITY(1,1) PRIMARY KEY,
     IdCombo         INT NOT NULL,
@@ -431,9 +375,7 @@ CREATE TABLE Usuarios (
 GO
 
 
--- ============================================================
--- DATOS DE PRUEBA
--- ============================================================
+
 
 -- Personas
 INSERT INTO Personas (Identificacion, Nombres, Apellidos, Telefono, Correo, FechaNacimiento, Direccion)
