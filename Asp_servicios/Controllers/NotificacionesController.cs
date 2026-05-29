@@ -96,5 +96,20 @@ namespace Asp_Servicios.Controllers
                 return BadRequest(new { mensaje = ex.Message });
             }
         }
+
+        // GET: api/[controller]/auditoria
+        [HttpGet("auditoria")]
+        public IActionResult ListarAuditoria()
+        {
+            try
+            {
+                var lista = negocio.ListarAuditoria();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
     }
 }

@@ -1,0 +1,28 @@
+@using Asp_Presentaciones.Infraestructura
+@model (List<FilaAuditoria> Filas, string EtiquetaRef)
+
+<table class="bb-table">
+    <thead>
+        <tr><th>#</th><th>@Model.EtiquetaRef</th><th>Acción</th><th>Fecha</th></tr>
+    </thead>
+    <tbody>
+        @if (Model.Filas == null || Model.Filas.Count == 0)
+        {
+            <tr><td colspan="4" class="text-tenue text-center py-4">Sin movimientos registrados.</td></tr>
+        }
+        else
+        {
+            @foreach (var f in Model.Filas.OrderByDescending(x => x.Fecha ?? DateTime.MinValue))
+            {
+                var a = (f.Accion ?? "").ToLower();
+                var cls = a.StartsWith("ins") ? "ins" : a.StartsWith("mod") ? "mod" : a.StartsWith("bor") ? "bor" : "mod";
+                <tr>
+                    <td>@f.IdAuditoria</td>
+                    <td>#@f.IdReferencia</td>
+                    <td><span class="estado @cls">@f.Accion</span></td>
+                    <td>@(f.Fecha?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

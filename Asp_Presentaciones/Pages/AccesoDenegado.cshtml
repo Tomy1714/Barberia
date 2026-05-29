@@ -1,0 +1,12 @@
+@page
+@model Asp_Presentaciones.Pages.AccesoDenegadoModel
+@{ ViewData["Title"] = "Acceso denegado"; }
+
+<div class="bb-card mx-auto" style="max-width:560px">
+    <div class="bb-card-body text-center py-5">
+        <div class="pole-grande mx-auto" style="opacity:.5"></div>
+        <h1 class="mt-3" style="color:var(--bb-oro-claro)">Acceso denegado</h1>
+        <p class="text-tenue">Tu rol <b>@Model.RolActual</b> no tiene permiso para ver esta sección.</p>
+        <a asp-page="/Index" class="btn btn-oro mt-2">Volver al inicio</a>
+    </div>
+</div>

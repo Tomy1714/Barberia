@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Barbería El Navaja — Muestra visual del front</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+/* === barberia.css (copia íntegra para que la muestra sea portable) === */
+:root{--bb-carbon:#15171c;--bb-carbon-2:#1d2027;--bb-panel:#23262f;--bb-borde:#313640;--bb-oro:#c8a24a;--bb-oro-claro:#e3c779;--bb-texto:#e8e6e1;--bb-texto-tenue:#9a9ba1;--bb-rojo:#c0392b;--bb-azul:#2c3e7a;--bb-ok:#3f9b6d;}
+*{box-sizing:border-box;}
+body{background:var(--bb-carbon);color:var(--bb-texto);font-family:"Segoe UI",system-ui,-apple-system,sans-serif;min-height:100vh;}
+.bb-brand{display:flex;align-items:center;gap:.6rem;font-weight:800;letter-spacing:.04em;}
+.bb-brand .pole{width:12px;height:30px;border-radius:6px;border:1px solid #0008;background:repeating-linear-gradient(45deg,var(--bb-rojo) 0 6px,#fff 6px 12px,var(--bb-azul) 12px 18px);box-shadow:0 0 0 2px #0006 inset;}
+.bb-brand .nombre{color:var(--bb-texto);font-size:1.15rem;}
+.bb-brand .nombre b{color:var(--bb-oro);}
+.bb-nav{background:linear-gradient(180deg,#1a1c22,#15171c);border-bottom:2px solid var(--bb-oro);box-shadow:0 4px 14px #0007;}
+.bb-nav .nav-link{color:var(--bb-texto-tenue) !important;font-weight:600;border-radius:6px;}
+.bb-nav .nav-link:hover,.bb-nav .nav-link.active{color:var(--bb-oro-claro) !important;background:#ffffff0d;}
+.bb-nav .dropdown-menu{background:var(--bb-panel);border:1px solid var(--bb-borde);}
+.bb-nav .dropdown-item{color:var(--bb-texto-tenue);}
+.bb-nav .dropdown-item:hover{background:#ffffff10;color:var(--bb-oro-claro);}
+.bb-chip-rol{background:var(--bb-oro);color:#1a1206;font-weight:700;border-radius:999px;padding:.12rem .7rem;font-size:.78rem;}
+.bb-card{background:var(--bb-panel);border:1px solid var(--bb-borde);border-radius:14px;box-shadow:0 6px 18px #0005;}
+.bb-card .bb-card-head{padding:1rem 1.25rem;border-bottom:1px solid var(--bb-borde);display:flex;align-items:center;justify-content:space-between;}
+.bb-card .bb-card-head h2,.bb-card .bb-card-head h1{font-size:1.25rem;margin:0;color:var(--bb-oro-claro);}
+.bb-card .bb-card-body{padding:1.25rem;}
+.bb-kpi{background:var(--bb-carbon-2);border:1px solid var(--bb-borde);border-radius:12px;padding:1.1rem 1.25rem;}
+.bb-kpi .v{font-size:2rem;font-weight:800;color:var(--bb-oro-claro);line-height:1;}
+.bb-kpi .t{color:var(--bb-texto-tenue);font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;}
+.bb-table{width:100%;border-collapse:separate;border-spacing:0;}
+.bb-table thead th{background:var(--bb-carbon-2);color:var(--bb-oro-claro);text-transform:uppercase;font-size:.76rem;letter-spacing:.05em;padding:.7rem .85rem;border-bottom:1px solid var(--bb-borde);text-align:left;}
+.bb-table tbody td{padding:.65rem .85rem;border-bottom:1px solid var(--bb-borde);color:var(--bb-texto);}
+.bb-table tbody tr:hover{background:#ffffff08;}
+.bb-table .acciones{white-space:nowrap;text-align:right;}
+.btn-oro{background:var(--bb-oro);border:none;color:#1a1206;font-weight:700;}
+.btn-oro:hover{background:var(--bb-oro-claro);color:#1a1206;}
+.btn-fantasma{background:transparent;border:1px solid var(--bb-borde);color:var(--bb-texto-tenue);}
+.btn-fantasma:hover{border-color:var(--bb-oro);color:var(--bb-oro-claro);}
+.estado{border-radius:999px;padding:.12rem .6rem;font-size:.76rem;font-weight:700;}
+.estado.pend{background:#5a4a1e;color:var(--bb-oro-claro);}
+.estado.conf{background:#1e3a5a;color:#8fc1ff;}
+.estado.comp{background:#1e4a36;color:#7fe0ab;}
+.estado.canc{background:#4a1e1e;color:#ff9b9b;}
+.estado.activo{background:#1e4a36;color:#7fe0ab;}
+.estado.inactivo{background:#3a3a3a;color:#b9b9b9;}
+.estado.ins{background:#1e4a36;color:#7fe0ab;}
+.estado.mod{background:#1e3a5a;color:#8fc1ff;}
+.estado.bor{background:#4a1e1e;color:#ff9b9b;}
+.modal-content{background:var(--bb-panel);color:var(--bb-texto);border:1px solid var(--bb-borde);border-radius:14px;}
+.modal-header{border-bottom:1px solid var(--bb-borde);}
+.modal-footer{border-top:1px solid var(--bb-borde);}
+.form-control,.form-select{background:var(--bb-carbon-2);border:1px solid var(--bb-borde);color:var(--bb-texto);}
+.form-control:focus,.form-select:focus{background:var(--bb-carbon-2);color:var(--bb-texto);border-color:var(--bb-oro);box-shadow:0 0 0 .2rem #c8a24a33;}
+.form-label{color:var(--bb-texto-tenue);font-weight:600;font-size:.85rem;}
+.nav-tabs{border-bottom:1px solid var(--bb-borde);}
+.nav-tabs .nav-link{color:var(--bb-texto-tenue);border:none;font-weight:600;}
+.nav-tabs .nav-link.active{color:var(--bb-oro-claro);background:transparent;border-bottom:2px solid var(--bb-oro);}
+.bb-login-wrap{min-height:90vh;display:flex;align-items:center;justify-content:center;}
+.bb-login{width:100%;max-width:400px;background:var(--bb-panel);border:1px solid var(--bb-borde);border-radius:16px;padding:2.2rem;box-shadow:0 18px 50px #000a;}
+.bb-login .marca{text-align:center;margin-bottom:1.6rem;}
+.bb-login .pole-grande{width:16px;height:52px;margin:0 auto .7rem;border-radius:8px;background:repeating-linear-gradient(45deg,var(--bb-rojo) 0 8px,#fff 8px 16px,var(--bb-azul) 16px 24px);box-shadow:0 0 0 2px #0006 inset,0 6px 16px #0008;}
+footer.bb-footer{color:var(--bb-texto-tenue);border-top:1px solid var(--bb-borde);padding:1rem 0;margin-top:2rem;}
+a{color:var(--bb-oro-claro);}
+.text-tenue{color:var(--bb-texto-tenue);}
+/* etiqueta de sección de la muestra */
+.muestra-sep{color:var(--bb-oro);text-align:center;letter-spacing:.2em;text-transform:uppercase;font-size:.8rem;margin:2.5rem 0 1rem;border-top:1px dashed var(--bb-borde);padding-top:1rem;}
+.modal-demo{position:static;display:block;}
+.modal-demo .modal-dialog{margin:0 auto;}
+</style>
+</head>
+<body class="pb-5">
+
+<div class="container" style="max-width:1040px">
+    <p class="muestra-sep">Muestra visual — Barbería El Navaja · Front ASP.NET Razor Pages</p>
+
+    <!-- ============ 1. LOGIN ============ -->
+    <p class="muestra-sep">1 · Inicio de sesión (valida el rol)</p>
+    <div class="bb-login-wrap" style="min-height:auto;padding:1.5rem 0">
+        <div class="bb-login">
+            <div class="marca">
+                <div class="pole-grande"></div>
+                <div class="bb-brand justify-content-center"><span class="nombre">Barbería <b>El Navaja</b></span></div>
+                <p class="text-tenue mt-2 mb-0">Acceso al sistema de gestión</p>
+            </div>
+            <div class="mb-3"><label class="form-label">Email</label><input class="form-control" value="admin@elnavaja.com" /></div>
+            <div class="mb-3"><label class="form-label">Contraseña</label><input type="password" class="form-control" value="••••••••" /></div>
+            <button class="btn btn-oro w-100">Entrar</button>
+            <p class="text-tenue text-center mt-3 mb-0" style="font-size:.8rem">Roles: Administrador · Recepcionista · Barbero · Cliente</p>
+        </div>
+    </div>
+
+    <!-- ============ 2. NAVBAR + DASHBOARD ============ -->
+    <p class="muestra-sep">2 · Navegación + Panel (vista Administrador)</p>
+    <nav class="bb-nav navbar navbar-expand-lg rounded-3 mb-3 px-3">
+        <span class="bb-brand"><span class="pole"></span><span class="nombre">Barbería <b>El Navaja</b></span></span>
+        <ul class="navbar-nav ms-3 flex-row gap-2">
+            <li class="nav-item"><a class="nav-link active">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link">Citas</a></li>
+            <li class="nav-item"><a class="nav-link">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link">Catálogo ▾</a></li>
+            <li class="nav-item"><a class="nav-link">Personal ▾</a></li>
+            <li class="nav-item"><a class="nav-link">Usuarios</a></li>
+        </ul>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <span class="bb-chip-rol">Administrador</span>
+            <span class="text-tenue" style="font-size:.85rem">admin@elnavaja.com</span>
+            <button class="btn btn-sm btn-fantasma">Salir</button>
+        </div>
+    </nav>
+
+    <h1 style="color:var(--bb-oro-claro)">Panel del Administrador</h1>
+    <p class="text-tenue">Resumen general de la barbería</p>
+    <div class="row g-3 mb-4">
+        <div class="col"><div class="bb-kpi"><div class="v">128</div><div class="t">Citas</div></div></div>
+        <div class="col"><div class="bb-kpi"><div class="v">73</div><div class="t">Clientes</div></div></div>
+        <div class="col"><div class="bb-kpi"><div class="v">6</div><div class="t">Barberos</div></div></div>
+        <div class="col"><div class="bb-kpi"><div class="v">14</div><div class="t">Servicios</div></div></div>
+        <div class="col"><div class="bb-kpi"><div class="v">3</div><div class="t">Sedes</div></div></div>
+    </div>
+    <div class="bb-card"><div class="bb-card-head"><h2>Citas recientes</h2></div><div class="bb-card-body p-0">
+        <table class="bb-table">
+            <thead><tr><th>#</th><th>Cliente</th><th>Barbero</th><th>Servicio</th><th>Fecha y hora</th><th>Estado</th></tr></thead>
+            <tbody>
+                <tr><td>128</td><td>Carlos Ramírez</td><td>Barbero (#3)</td><td>Corte clásico</td><td>29/05/2026 10:30</td><td><span class="estado conf">Confirmada</span></td></tr>
+                <tr><td>127</td><td>Andrés Gómez</td><td>Barbero (#1)</td><td>Corte + barba</td><td>29/05/2026 09:00</td><td><span class="estado comp">Completada</span></td></tr>
+                <tr><td>126</td><td>Luis Peña</td><td>Barbero (#3)</td><td>Afeitado premium</td><td>28/05/2026 18:15</td><td><span class="estado canc">Cancelada</span></td></tr>
+                <tr><td>125</td><td>Mateo Díaz</td><td>Barbero (#2)</td><td>Arreglo de barba</td><td>28/05/2026 16:45</td><td><span class="estado pend">Pendiente</span></td></tr>
+            </tbody>
+        </table>
+    </div></div>
+
+    <!-- ============ 3. CRUD + AUDITORÍA ============ -->
+    <p class="muestra-sep">3 · Ventana CRUD con pestañas (Servicios)</p>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 style="color:var(--bb-oro-claro);margin:0">Servicios</h1>
+        <button class="btn btn-oro">+ Agregar servicio</button>
+    </div>
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item"><a class="nav-link active">Registros</a></li>
+        <li class="nav-item"><a class="nav-link">Auditoría</a></li>
+    </ul>
+    <div class="bb-card mb-2"><div class="bb-card-body p-0">
+        <table class="bb-table">
+            <thead><tr><th>#</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>Duración</th><th>Estado</th><th class="acciones">Acciones</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>Corte clásico</td><td>Tijera y máquina</td><td>$25.000</td><td>30 min</td><td><span class="estado activo">Activo</span></td><td class="acciones"><button class="btn btn-sm btn-fantasma">Editar</button> <button class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button></td></tr>
+                <tr><td>2</td><td>Corte + barba</td><td>Combo completo</td><td>$38.000</td><td>50 min</td><td><span class="estado activo">Activo</span></td><td class="acciones"><button class="btn btn-sm btn-fantasma">Editar</button> <button class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button></td></tr>
+                <tr><td>3</td><td>Afeitado premium</td><td>Toalla caliente</td><td>$30.000</td><td>40 min</td><td><span class="estado inactivo">Inactivo</span></td><td class="acciones"><button class="btn btn-sm btn-fantasma">Editar</button> <button class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button></td></tr>
+            </tbody>
+        </table>
+    </div></div>
+    <p class="text-tenue" style="font-size:.85rem">Pestaña «Auditoría» (solo Administrador) — registra cada movimiento:</p>
+    <div class="bb-card mb-2"><div class="bb-card-body p-0">
+        <table class="bb-table">
+            <thead><tr><th>#</th><th>Ref. Servicio</th><th>Acción</th><th>Fecha</th></tr></thead>
+            <tbody>
+                <tr><td>42</td><td>#3</td><td><span class="estado bor">Borrar</span></td><td>28/05/2026 18:20</td></tr>
+                <tr><td>41</td><td>#2</td><td><span class="estado mod">Modificar</span></td><td>27/05/2026 11:05</td></tr>
+                <tr><td>40</td><td>#1</td><td><span class="estado ins">Insertar</span></td><td>26/05/2026 09:12</td></tr>
+            </tbody>
+        </table>
+    </div></div>
+
+    <!-- ============ 4. MODAL ============ -->
+    <p class="muestra-sep">4 · Ventana emergente (alta / edición)</p>
+    <div class="modal modal-demo"><div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Nuevo servicio</h5><button class="btn-close btn-close-white"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label">Nombre</label><input class="form-control" value="Corte degradado" /></div>
+                <div class="mb-3"><label class="form-label">Descripción</label><input class="form-control" value="Fade con diseño" /></div>
+                <div class="row">
+                    <div class="col mb-3"><label class="form-label">Precio base</label><input class="form-control" value="32000" /></div>
+                    <div class="col mb-3"><label class="form-label">Duración (min)</label><input class="form-control" value="45" /></div>
+                </div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" checked /><label class="form-check-label text-tenue">Activo</label></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-fantasma">Cancelar</button><button class="btn btn-oro">Guardar</button></div>
+        </div>
+    </div></div>
+
+    <footer class="bb-footer text-center">Barbería El Navaja · Muestra estática del front (sin backend) · 2026</footer>
+</div>
+</body>
+</html>

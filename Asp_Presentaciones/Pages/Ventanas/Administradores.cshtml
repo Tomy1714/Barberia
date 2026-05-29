@@ -1,0 +1,99 @@
+@page
+@model Asp_Presentaciones.Pages.Ventanas.AdministradoresModel
+@{ ViewData["Title"] = "Administradores"; bool admin = Model.EsAdministrador; }
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 style="color:var(--bb-oro-claro);margin:0">Administradores</h1>
+        <p class="text-tenue mb-0">Hereda de Empleados</p>
+    </div>
+    @if (admin) { <button class="btn btn-oro" onclick="bbAbrirModal('modalAdministrador', null)">+ Agregar administrador</button> }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
+    @if (admin) { <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li> }
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tabReg">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <table class="bb-table">
+                <thead><tr><th>#</th><th>Empleado</th><th>Negocio</th><th>% Utilidades</th><th>Fundación</th><th>Utilidad últ. mes</th>@if (admin) { <th class="acciones">Acciones</th> }</tr></thead>
+                <tbody>
+                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin administradores.</td></tr> }
+                    @foreach (var a in Model.Lista)
+                    {
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { a.IdAdministrador, a.IdEmpleado, a.NombreNegocio, a.PorcentajeUtilidades, FechaFundacion = a.FechaFundacion?.ToString("yyyy-MM-dd"), a.UtilidadesUltimoMes });
+                        <tr>
+                            <td>@a.IdAdministrador</td>
+                            <td>@Model.Empleado(a.IdEmpleado)</td>
+                            <td>@a.NombreNegocio</td>
+                            <td>@a.PorcentajeUtilidades%</td>
+                            <td>@(a.FechaFundacion?.ToString("dd/MM/yyyy") ?? "—")</td>
+                            <td>@a.UtilidadesUltimoMes.ToString("C0")</td>
+                            @if (admin)
+                            {
+                                <td class="acciones">
+                                    <button class="btn btn-sm btn-fantasma" data-json="@json" onclick="bbAbrirModal('modalAdministrador', JSON.parse(this.dataset.json))">Editar</button>
+                                    <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
+                                        <input type="hidden" name="Item.IdAdministrador" value="@a.IdAdministrador" />
+                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card"><div class="bb-card-body p-0">
+                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Administrador"))" />
+            </div></div>
+        </div>
+    }
+</div>
+
+@if (admin)
+{
+    <div class="modal fade" id="modalAdministrador" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> administrador</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdAdministrador" />
+                    <div class="mb-3">
+                        <label class="form-label">Empleado</label>
+                        <select asp-for="Item.IdEmpleado" class="form-select" required>
+                            <option value="">— Seleccione —</option>
+                            @foreach (var e in Model.Empleados)
+                            {
+                                <option value="@e.IdEmpleado">@e.Cargo (#@e.IdEmpleado)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Nombre del negocio</label><input asp-for="Item.NombreNegocio" class="form-control" /></div>
+                    <div class="row">
+                        <div class="col mb-3"><label class="form-label">% Utilidades</label><input asp-for="Item.PorcentajeUtilidades" type="number" step="0.01" min="0" class="form-control" /></div>
+                        <div class="col mb-3"><label class="form-label">Fecha fundación</label><input asp-for="Item.FechaFundacion" type="date" class="form-control" /></div>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Utilidades último mes</label><input asp-for="Item.UtilidadesUltimoMes" type="number" step="0.01" min="0" class="form-control" /></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

@@ -1,0 +1,81 @@
+@page
+@model Asp_Presentaciones.Pages.Ventanas.PersonasModel
+@{ ViewData["Title"] = "Personas"; }
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 style="color:var(--bb-oro-claro);margin:0">Personas</h1>
+        <p class="text-tenue mb-0">Entidad base · de ella heredan Empleados y Clientes</p>
+    </div>
+    <button class="btn btn-oro" onclick="bbAbrirModal('modalPersona', null)">+ Agregar persona</button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tabReg">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <table class="bb-table">
+                <thead><tr><th>#</th><th>Identificación</th><th>Nombres</th><th>Apellidos</th><th>Teléfono</th><th>Correo</th><th class="acciones">Acciones</th></tr></thead>
+                <tbody>
+                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin personas.</td></tr> }
+                    @foreach (var p in Model.Lista)
+                    {
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdPersona, p.Identificacion, p.Nombres, p.Apellidos, p.Telefono, p.Correo, p.Direccion, FechaNacimiento = p.FechaNacimiento?.ToString("yyyy-MM-dd") });
+                        <tr>
+                            <td>@p.IdPersona</td><td>@p.Identificacion</td><td>@p.Nombres</td>
+                            <td>@p.Apellidos</td><td>@p.Telefono</td><td class="text-tenue">@p.Correo</td>
+                            <td class="acciones">
+                                <button class="btn btn-sm btn-fantasma" data-json="@json" onclick="bbAbrirModal('modalPersona', JSON.parse(this.dataset.json))">Editar</button>
+                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
+                                    <input type="hidden" name="Item.IdPersona" value="@p.IdPersona" />
+                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="tabAud">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Persona"))" />
+        </div></div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalPersona" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="post" asp-page-handler="Guardar" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><span class="modo-titulo">Nueva</span> persona</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" asp-for="Item.IdPersona" />
+                <div class="mb-3"><label class="form-label">Identificación</label><input asp-for="Item.Identificacion" class="form-control" /></div>
+                <div class="row">
+                    <div class="col mb-3"><label class="form-label">Nombres</label><input asp-for="Item.Nombres" class="form-control" required /></div>
+                    <div class="col mb-3"><label class="form-label">Apellidos</label><input asp-for="Item.Apellidos" class="form-control" required /></div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3"><label class="form-label">Teléfono</label><input asp-for="Item.Telefono" class="form-control" /></div>
+                    <div class="col mb-3"><label class="form-label">Fecha nacimiento</label><input asp-for="Item.FechaNacimiento" type="date" class="form-control" /></div>
+                </div>
+                <div class="mb-3"><label class="form-label">Correo</label><input asp-for="Item.Correo" type="email" class="form-control" /></div>
+                <div class="mb-3"><label class="form-label">Dirección</label><input asp-for="Item.Direccion" class="form-control" /></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-oro">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>

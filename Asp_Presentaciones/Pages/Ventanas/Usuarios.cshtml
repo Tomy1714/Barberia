@@ -1,0 +1,105 @@
+@page
+@model Asp_Presentaciones.Pages.Ventanas.UsuariosModel
+@{ ViewData["Title"] = "Usuarios"; bool admin = Model.EsAdministrador; }
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 style="color:var(--bb-oro-claro);margin:0">Usuarios</h1>
+        <p class="text-tenue mb-0">Credenciales de acceso al sistema</p>
+    </div>
+    @if (admin) { <button class="btn btn-oro" onclick="bbAbrirModal('modalUsuario', null)">+ Agregar usuario</button> }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
+    @if (admin) { <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li> }
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tabReg">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <table class="bb-table">
+                <thead><tr><th>#</th><th>Persona</th><th>Email</th><th>Rol</th><th>Estado</th><th>Creado</th>@if (admin) { <th class="acciones">Acciones</th> }</tr></thead>
+                <tbody>
+                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin usuarios.</td></tr> }
+                    @foreach (var u in Model.Lista)
+                    {
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { u.IdUsuario, u.IdPersona, u.Email, u.Rol, u.Activo });
+                        <tr>
+                            <td>@u.IdUsuario</td>
+                            <td>@Model.NombrePersona(u.IdPersona) <span class="text-tenue">#@u.IdPersona</span></td>
+                            <td>@u.Email</td>
+                            <td><span class="estado activo">@u.Rol</span></td>
+                            <td><span class="estado @(u.Activo ? "activo" : "inactivo")">@(u.Activo ? "Activo" : "Inactivo")</span></td>
+                            <td>@u.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            @if (admin)
+                            {
+                                <td class="acciones">
+                                    <button class="btn btn-sm btn-fantasma" data-json="@json" onclick="bbAbrirModal('modalUsuario', JSON.parse(this.dataset.json))">Editar</button>
+                                    <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
+                                        <input type="hidden" name="Item.IdUsuario" value="@u.IdUsuario" />
+                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card"><div class="bb-card-body p-0">
+                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Usuario"))" />
+            </div></div>
+        </div>
+    }
+</div>
+
+@if (admin)
+{
+    <div class="modal fade" id="modalUsuario" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> usuario</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdUsuario" />
+                    <div class="mb-3">
+                        <label class="form-label">Persona</label>
+                        <select asp-for="Item.IdPersona" class="form-select" required>
+                            <option value="">— Seleccione —</option>
+                            @foreach (var p in Model.Personas)
+                            {
+                                <option value="@p.IdPersona">@p.Nombres @p.Apellidos (#@p.IdPersona)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Email</label><input asp-for="Item.Email" type="email" class="form-control" required /></div>
+                    <div class="mb-3"><label class="form-label">Contraseña</label><input asp-for="Item.Contrasena" type="password" class="form-control" /></div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select asp-for="Item.Rol" class="form-select" required>
+                            @foreach (var r in Asp_Presentaciones.Pages.Ventanas.UsuariosModel.Roles)
+                            {
+                                <option value="@r">@r</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-check"><input asp-for="Item.Activo" type="checkbox" class="form-check-input" /><label class="form-check-label" for="Item_Activo">Activo</label></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

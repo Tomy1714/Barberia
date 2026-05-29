@@ -1,52 +1,117 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@using Asp_Presentaciones.Infraestructura
+@{
+    var sesion = Context.Session;
+    var autenticado = Sesion.Autenticado(sesion);
+    var rol = Sesion.Rol(sesion);
+    var email = Sesion.Email(sesion);
+    bool admin = rol == "Administrador";
+    bool recep = rol == "Recepcionista";
+    bool barbero = rol == "Barbero";
+    bool cliente = rol == "Cliente";
+    string Activo(string page) => (ViewContext.RouteData.Values["page"]?.ToString() ?? "") == page ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Asp_Presentaciones</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] · Barbería</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Asp_Presentaciones.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/barberia.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Asp_Presentaciones</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    @if (autenticado)
+    {
+        <header>
+            <nav class="navbar navbar-expand-lg bb-nav mb-4">
+                <div class="container">
+                    <a class="navbar-brand bb-brand" asp-page="/Index">
+                        <span class="pole"></span>
+                        <span class="nombre">Barbería <b>El Navaja</b></span>
+                    </a>
+                    <button class="navbar-toggler btn-fantasma" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navMain">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link @Activo("/Index")" asp-page="/Index">Inicio</a>
+                            </li>
+
+                            @* Citas: visible para todos los roles *@
+                            <li class="nav-item">
+                                <a class="nav-link @Activo("/Ventanas/Citas")" asp-page="/Ventanas/Citas">Citas</a>
+                            </li>
+
+                            @if (admin || recep)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @Activo("/Ventanas/Clientes")" asp-page="/Ventanas/Clientes">Clientes</a>
+                                </li>
+                            }
+
+                            @if (admin || recep || barbero || cliente)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Catálogo</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Servicios">Servicios</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Sedes">Sedes</a></li>
+                                        @if (admin || recep)
+                                        {
+                                            <li><a class="dropdown-item" asp-page="/Ventanas/Barberos">Barberos</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+
+                            @if (admin)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Personal</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Personas">Personas</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Empleados">Empleados</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Barberos">Barberos</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Recepcionistas">Recepcionistas</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Administradores">Administradores</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @Activo("/Ventanas/Usuarios")" asp-page="/Ventanas/Usuarios">Usuarios</a>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="bb-chip-rol">@rol</span>
+                            <span class="text-tenue d-none d-md-inline">@email</span>
+                            <form method="post" asp-page="/Account/Logout" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-fantasma">Salir</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
+            </nav>
+        </header>
+    }
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Asp_Presentaciones - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer class="bb-footer">
+        <div class="container d-flex justify-content-between">
+            <span>&copy; 2026 · Barbería El Navaja</span>
+            <span class="text-tenue">Sistema de gestión</span>
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
+    <script src="~/js/barberia.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

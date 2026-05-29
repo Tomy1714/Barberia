@@ -1,0 +1,38 @@
+@page
+@model Asp_Presentaciones.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Acceso";
+    Layout = "_Layout";
+}
+
+<div class="bb-login-wrap">
+    <form method="post" class="bb-login">
+        <div class="marca">
+            <div class="pole-grande"></div>
+            <div class="bb-brand justify-content-center">
+                <span class="nombre" style="font-size:1.5rem">Barbería <b>El Navaja</b></span>
+            </div>
+            <p class="text-tenue mt-2 mb-0">Acceso al sistema de gestión</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Error))
+        {
+            <div class="alert alert-danger py-2">@Model.Error</div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input asp-for="Email" type="email" class="form-control" placeholder="correo@ejemplo.com" autofocus required />
+        </div>
+        <div class="mb-4">
+            <label class="form-label">Contraseña</label>
+            <input asp-for="Contrasena" type="password" class="form-control" placeholder="....." required />
+        </div>
+
+        <button type="submit" class="btn btn-oro w-100 py-2">Iniciar sesión</button>
+
+        <p class="text-tenue text-center mt-3 mb-0" style="font-size:.8rem">
+            Administrador · Recepcionista · Barbero · Cliente
+        </p>
+    </form>
+</div>

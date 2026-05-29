@@ -15,6 +15,11 @@
 	  <ProjectReference Include="..\Lib_Presentaciones\Lib_Presentaciones.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Pages\Emergentes\" />
+	  <Folder Include="Pages\Ventanas\" />
+	</ItemGroup>
+
 
 	
 </Project>

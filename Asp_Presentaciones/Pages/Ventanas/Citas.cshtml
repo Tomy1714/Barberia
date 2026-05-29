@@ -1,0 +1,127 @@
+@page
+@model Asp_Presentaciones.Pages.Ventanas.CitasModel
+@{ ViewData["Title"] = "Citas"; bool admin = Model.EsAdministrador; bool puedeAgendar = admin || Model.EsRecepcionista || Model.EsCliente; }
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 style="color:var(--bb-oro-claro);margin:0">Citas</h1>
+        <p class="text-tenue mb-0">Agenda de servicios</p>
+    </div>
+    @if (puedeAgendar) { <button class="btn btn-oro" onclick="bbAbrirModal('modalCita', null)">+ Agendar cita</button> }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
+    @if (admin) { <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li> }
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tabReg">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <table class="bb-table">
+                <thead><tr><th>#</th><th>Cliente</th><th>Barbero</th><th>Servicio</th><th>Fecha y hora</th><th>Estado</th>@if (puedeAgendar) { <th class="acciones">Acciones</th> }</tr></thead>
+                <tbody>
+                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin citas registradas.</td></tr> }
+                    @foreach (var c in Model.Lista)
+                    {
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { c.IdCita, c.IdCliente, c.IdBarbero, c.IdServicio, FechaHoraInicio = c.FechaHoraInicio?.ToString("yyyy-MM-ddTHH:mm"), c.Estado, c.Observaciones });
+                        <tr>
+                            <td>@c.IdCita</td>
+                            <td>@Model.Cliente(c.IdCliente)</td>
+                            <td>@Model.Barbero(c.IdBarbero)</td>
+                            <td>@Model.Servicio(c.IdServicio)</td>
+                            <td>@(c.FechaHoraInicio?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                            <td><span class="estado @Model.EstadoClase(c.Estado)">@(c.Estado ?? "Pendiente")</span></td>
+                            @if (puedeAgendar)
+                            {
+                                <td class="acciones">
+                                    <button class="btn btn-sm btn-fantasma" data-json="@json" onclick="bbAbrirModal('modalCita', JSON.parse(this.dataset.json))">Editar</button>
+                                    @if (admin || Model.EsRecepcionista)
+                                    {
+                                        <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
+                                            <input type="hidden" name="Item.IdCita" value="@c.IdCita" />
+                                            <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                        </form>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card"><div class="bb-card-body p-0">
+                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Cita"))" />
+            </div></div>
+        </div>
+    }
+</div>
+
+@if (puedeAgendar)
+{
+    <div class="modal fade" id="modalCita" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="modo-titulo">Nueva</span> cita</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdCita" />
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+                        <select asp-for="Item.IdCliente" class="form-select" required>
+                            <option value="">— Seleccione —</option>
+                            @foreach (var cl in Model.Clientes)
+                            {
+                                <option value="@cl.IdCliente">@Model.Cliente(cl.IdCliente) (#@cl.IdCliente)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Barbero</label>
+                        <select asp-for="Item.IdBarbero" class="form-select" required>
+                            <option value="">— Seleccione —</option>
+                            @foreach (var b in Model.Barberos)
+                            {
+                                <option value="@b.IdBarbero">@Model.Barbero(b.IdBarbero)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Servicio</label>
+                        <select asp-for="Item.IdServicio" class="form-select" required>
+                            <option value="">— Seleccione —</option>
+                            @foreach (var s in Model.Servicios)
+                            {
+                                <option value="@s.IdServicio">@s.Nombre — @s.PrecioBase.ToString("C0")</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Fecha y hora</label><input asp-for="Item.FechaHoraInicio" type="datetime-local" class="form-control" required /></div>
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select asp-for="Item.Estado" class="form-select">
+                            @foreach (var e in Asp_Presentaciones.Pages.Ventanas.CitasModel.Estados)
+                            {
+                                <option value="@e">@e</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Observaciones</label><textarea asp-for="Item.Observaciones" class="form-control" rows="2"></textarea></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

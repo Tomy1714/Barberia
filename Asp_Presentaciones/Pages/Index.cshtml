@@ -1,10 +1,71 @@
-﻿@page
-@model IndexModel
+@page
+@model Asp_Presentaciones.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Inicio";
+    string saludo = Model.RolActual switch
+    {
+        "Administrador" => "Panel de administración",
+        "Recepcionista" => "Recepción",
+        "Barbero"       => "Tu agenda",
+        "Cliente"       => "Mis citas",
+        _               => "Inicio"
+    };
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 style="color:var(--bb-oro-claro);margin:0">@saludo</h1>
+        <p class="text-tenue mb-0">Bienvenido, @Model.EmailActual</p>
+    </div>
+    <a asp-page="/Ventanas/Citas" class="btn btn-oro">+ Nueva cita</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Aviso))
+{
+    <div class="alert alert-warning">@Model.Aviso</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-2"><div class="bb-kpi"><div class="v">@Model.CitasHoy</div><div class="t">Citas hoy</div></div></div>
+    <div class="col-6 col-lg-2"><div class="bb-kpi"><div class="v">@Model.TotalCitas</div><div class="t">Citas totales</div></div></div>
+    @if (Model.EsAdministrador || Model.EsRecepcionista)
+    {
+        <div class="col-6 col-lg-2"><div class="bb-kpi"><div class="v">@Model.TotalClientes</div><div class="t">Clientes</div></div></div>
+        <div class="col-6 col-lg-2"><div class="bb-kpi"><div class="v">@Model.TotalBarberos</div><div class="t">Barberos</div></div></div>
+    }
+    <div class="col-6 col-lg-2"><div class="bb-kpi"><div class="v">@Model.TotalServicios</div><div class="t">Servicios</div></div></div>
+    <div class="col-6 col-lg-2"><div class="bb-kpi"><div class="v">@Model.TotalSedes</div><div class="t">Sedes</div></div></div>
+</div>
+
+<div class="bb-card">
+    <div class="bb-card-head">
+        <h2>Citas recientes</h2>
+        <a asp-page="/Ventanas/Citas" class="btn btn-sm btn-fantasma">Ver todas</a>
+    </div>
+    <div class="bb-card-body p-0">
+        <table class="bb-table">
+            <thead>
+                <tr><th>#</th><th>Fecha y hora</th><th>Cliente</th><th>Barbero</th><th>Servicio</th><th>Estado</th></tr>
+            </thead>
+            <tbody>
+                @if (Model.CitasRecientes.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-tenue text-center py-4">Sin citas para mostrar.</td></tr>
+                }
+                @foreach (var c in Model.CitasRecientes)
+                {
+                    string est = (c.Estado ?? "Pendiente").ToLower();
+                    string cls = est.StartsWith("conf") ? "conf" : est.StartsWith("comp") ? "comp" : est.StartsWith("canc") ? "canc" : "pend";
+                    <tr>
+                        <td>@c.IdCita</td>
+                        <td>@(c.FechaHoraInicio?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                        <td>#@c.IdCliente</td>
+                        <td>#@c.IdBarbero</td>
+                        <td>#@c.IdServicio</td>
+                        <td><span class="estado @cls">@(c.Estado ?? "Pendiente")</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

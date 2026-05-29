@@ -1,0 +1,108 @@
+@page
+@model Asp_Presentaciones.Pages.Ventanas.RecepcionistasModel
+@{ ViewData["Title"] = "Recepcionistas"; bool admin = Model.EsAdministrador; }
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 style="color:var(--bb-oro-claro);margin:0">Recepcionistas</h1>
+        <p class="text-tenue mb-0">Hereda de Empleados</p>
+    </div>
+    @if (admin) { <button class="btn btn-oro" onclick="bbAbrirModal('modalRecepcionista', null)">+ Agregar recepcionista</button> }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
+    @if (admin) { <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li> }
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tabReg">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <table class="bb-table">
+                <thead><tr><th>#</th><th>Empleado</th><th>Sede</th><th>Turno</th><th>Citas/mes</th><th>Bono meta</th>@if (admin) { <th class="acciones">Acciones</th> }</tr></thead>
+                <tbody>
+                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin recepcionistas.</td></tr> }
+                    @foreach (var r in Model.Lista)
+                    {
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { r.IdRecepcionista, r.IdEmpleado, r.IdSede, r.TurnoAsignado, r.CitasGestionadasMes, r.BonoPorMeta });
+                        <tr>
+                            <td>@r.IdRecepcionista</td>
+                            <td>@Model.Empleado(r.IdEmpleado)</td>
+                            <td>@Model.Sede(r.IdSede)</td>
+                            <td>@r.TurnoAsignado</td>
+                            <td>@r.CitasGestionadasMes</td>
+                            <td>@r.BonoPorMeta.ToString("C0")</td>
+                            @if (admin)
+                            {
+                                <td class="acciones">
+                                    <button class="btn btn-sm btn-fantasma" data-json="@json" onclick="bbAbrirModal('modalRecepcionista', JSON.parse(this.dataset.json))">Editar</button>
+                                    <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
+                                        <input type="hidden" name="Item.IdRecepcionista" value="@r.IdRecepcionista" />
+                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card"><div class="bb-card-body p-0">
+                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Recepcionista"))" />
+            </div></div>
+        </div>
+    }
+</div>
+
+@if (admin)
+{
+    <div class="modal fade" id="modalRecepcionista" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> recepcionista</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdRecepcionista" />
+                    <div class="mb-3">
+                        <label class="form-label">Empleado</label>
+                        <select asp-for="Item.IdEmpleado" class="form-select" required>
+                            <option value="">— Seleccione —</option>
+                            @foreach (var e in Model.Empleados)
+                            {
+                                <option value="@e.IdEmpleado">@e.Cargo (#@e.IdEmpleado)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sede</label>
+                        <select asp-for="Item.IdSede" class="form-select" required>
+                            <option value="">— Seleccione —</option>
+                            @foreach (var s in Model.Sedes)
+                            {
+                                <option value="@s.IdSede">@s.Nombre (#@s.IdSede)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Turno asignado</label><input asp-for="Item.TurnoAsignado" class="form-control" placeholder="Mañana / Tarde / Noche" /></div>
+                    <div class="row">
+                        <div class="col mb-3"><label class="form-label">Citas gestionadas/mes</label><input asp-for="Item.CitasGestionadasMes" type="number" min="0" class="form-control" /></div>
+                        <div class="col mb-3"><label class="form-label">Bono por meta</label><input asp-for="Item.BonoPorMeta" type="number" step="0.01" min="0" class="form-control" /></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
