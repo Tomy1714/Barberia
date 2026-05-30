@@ -116,10 +116,25 @@ body {
 .nav-tabs .nav-link.active { color: var(--bb-oro-claro); background: transparent; border-bottom: 2px solid var(--bb-oro); }
 
 /* ----- Login ----- */
-.bb-login-wrap { min-height: 90vh; display: flex; align-items: center; justify-content: center; }
+.bb-login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient( rgba(0,0,0,0.70), rgba(0,0,0,0.70) ), url('/images/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
 .bb-login {
-    width: 100%; max-width: 400px; background: var(--bb-panel);
-    border: 1px solid var(--bb-borde); border-radius: 16px; padding: 2.2rem; box-shadow: 0 18px 50px #000a;
+    width: 100%;
+    max-width: 400px;
+    background: rgba(35, 38, 47, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--bb-borde);
+    border-radius: 16px;
+    padding: 2.2rem;
+    box-shadow: 0 18px 50px #000a;
 }
 .bb-login .marca { text-align: center; margin-bottom: 1.6rem; }
 .bb-login .pole-grande {

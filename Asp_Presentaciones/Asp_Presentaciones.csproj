@@ -18,7 +18,10 @@
 	<ItemGroup>
 	  <Folder Include="Pages\Emergentes\" />
 	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="QuestPDF" Version="2026.5.0" />
+	</ItemGroup>
 
 
-	
+
 </Project>

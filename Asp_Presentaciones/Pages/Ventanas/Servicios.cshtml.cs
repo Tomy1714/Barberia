@@ -2,6 +2,9 @@ using Asp_Presentaciones.Infraestructura;
 using LibPresentaciones.Implementaciones;
 using Lib_Negocio.Entidades;
 using Microsoft.AspNetCore.Mvc;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace Asp_Presentaciones.Pages.Ventanas
 {
@@ -50,6 +53,64 @@ namespace Asp_Presentaciones.Pages.Ventanas
             catch (Exception ex) { ErrorMsg = ex.Message; }
             return RedirectToPage();
         }
+
+
+        public IActionResult OnGetExportarPdf()
+        {
+            Cargar();
+
+            byte[] pdf = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(20);
+
+                    page.Header()
+                        .Text("Reporte de Servicios - BarberPro")
+                        .FontSize(20)
+                        .Bold();
+
+                    page.Content().Table(tabla =>
+                    {
+                        tabla.ColumnsDefinition(columns =>
+                        {
+                            columns.ConstantColumn(50);
+                            columns.RelativeColumn();
+                            columns.RelativeColumn();
+                            columns.ConstantColumn(80);
+                            columns.ConstantColumn(80);
+                        });
+
+                        tabla.Header(header =>
+                        {
+                            header.Cell().Text("ID");
+                            header.Cell().Text("Nombre");
+                            header.Cell().Text("Descripción");
+                            header.Cell().Text("Precio");
+                            header.Cell().Text("Duración");
+                        });
+
+                        foreach (var s in Lista)
+                        {
+                            tabla.Cell().Text(s.IdServicio.ToString());
+                            tabla.Cell().Text(s.Nombre);
+                            tabla.Cell().Text(s.Descripcion);
+                            tabla.Cell().Text("$" + s.PrecioBase.ToString("N0"));
+                            tabla.Cell().Text(s.DuracionMinutos + " min");
+                        }
+                    });
+
+                    page.Footer()
+                        .AlignCenter()
+                        .Text($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}");
+                });
+            }).GeneratePdf();
+
+            return File(pdf, "application/pdf", "Servicios.pdf");
+        }
+
+
+
 
         private void Cargar()
         {

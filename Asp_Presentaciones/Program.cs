@@ -1,3 +1,5 @@
+using QuestPDF.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,7 +15,7 @@ builder.Services.AddSession(opciones =>
     opciones.Cookie.IsEssential = true;
     opciones.Cookie.Name = ".Barberia.Sesion";
 });
-
+QuestPDF.Settings.License = LicenseType.Community;
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

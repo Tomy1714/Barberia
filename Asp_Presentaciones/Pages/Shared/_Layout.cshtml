@@ -19,6 +19,7 @@
     <title>@ViewData["Title"] · Barbería</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/barberia.css" asp-append-version="true" />
+
 </head>
 <body>
     @if (autenticado)
@@ -30,6 +31,9 @@
                         <span class="pole"></span>
                         <span class="nombre">Barbería <b>BarberPro</b></span>
                     </a>
+                    <img src="~/images/logo.png"
+                         alt="Logo"
+                         style="height:60px;" />
                     <button class="navbar-toggler btn-fantasma" type="button"
                             data-bs-toggle="collapse" data-bs-target="#navMain">
                         <span class="navbar-toggler-icon"></span>

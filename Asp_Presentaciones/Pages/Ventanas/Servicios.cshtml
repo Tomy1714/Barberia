@@ -4,10 +4,18 @@
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <h1 style="color:var(--bb-oro-claro);margin:0">Servicios</h1>
+
+<div>
+        <a asp-page-handler="ExportarPdf"
+               class="btn btn-fantasma">
+            Descargar PDF
+        </a>
+
     @if (admin)
     {
         <button class="btn btn-oro" onclick="bbAbrirModal('modalServicio', null)">+ Agregar servicio</button>
     }
+</div>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
