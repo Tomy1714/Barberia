@@ -1,12 +1,11 @@
-// Abre un modal de formulario. Si 'datos' es null => modo "nuevo" (limpia campos).
-// Si trae objeto => modo "editar" (rellena por name="Item.<clave>").
+
 function bbAbrirModal(idModal, datos) {
     var modal = document.getElementById(idModal);
     if (!modal) return;
     var form = modal.querySelector('form');
 
     form.querySelectorAll('input, select, textarea').forEach(function (el) {
-        if (el.name && el.name.indexOf('__') === 0) return; // token antifalsificacion
+        if (el.name && el.name.indexOf('__') === 0) return; 
         if (el.type === 'checkbox') el.checked = false;
         else el.value = '';
     });
@@ -31,7 +30,7 @@ function bbAbrirModal(idModal, datos) {
     new bootstrap.Modal(modal).show();
 }
 
-// Confirmacion para los formularios de borrado.
+
 function bbConfirmarBorrado(ev) {
     if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) {
         ev.preventDefault();

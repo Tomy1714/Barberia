@@ -8,7 +8,8 @@
     bool recep = rol == "Recepcionista";
     bool barbero = rol == "Barbero";
     bool cliente = rol == "Cliente";
-    string Activo(string page) => (ViewContext.RouteData.Values["page"]?.ToString() ?? "") == page ? "active" : "";
+    string Activo(string page) =>
+        (ViewContext.RouteData.Values["page"]?.ToString() ?? "") == page ? "active" : "";
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -27,44 +28,53 @@
                 <div class="container">
                     <a class="navbar-brand bb-brand" asp-page="/Index">
                         <span class="pole"></span>
-                        <span class="nombre">Barbería <b>El Navaja</b></span>
+                        <span class="nombre">Barbería <b>BarberPro</b></span>
                     </a>
-                    <button class="navbar-toggler btn-fantasma" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                    <button class="navbar-toggler btn-fantasma" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#navMain">
                         <span class="navbar-toggler-icon"></span>
                     </button>
+
                     <div class="collapse navbar-collapse" id="navMain">
                         <ul class="navbar-nav me-auto">
+
+                            @* Inicio  *@
                             <li class="nav-item">
                                 <a class="nav-link @Activo("/Index")" asp-page="/Index">Inicio</a>
                             </li>
 
-                            @* Citas: visible para todos los roles *@
+                            @* Citas: todos los roles  *@
                             <li class="nav-item">
                                 <a class="nav-link @Activo("/Ventanas/Citas")" asp-page="/Ventanas/Citas">Citas</a>
                             </li>
 
+                            @* Clientes: admin y recepcionista  *@
                             @if (admin || recep)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link @Activo("/Ventanas/Clientes")" asp-page="/Ventanas/Clientes">Clientes</a>
+                                    <a class="nav-link @Activo("/Ventanas/Clientes")"
+                                       asp-page="/Ventanas/Clientes">Clientes</a>
                                 </li>
                             }
 
-                            @if (admin || recep || barbero || cliente)
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Catálogo</a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-page="/Ventanas/Servicios">Servicios</a></li>
+                            @* Catalogo: servicios visibles para todos  *@
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Catálogo</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/Ventanas/Servicios">Servicios</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Ventanas/ServiciosCorte">Cortes</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Ventanas/ServiciosTratamiento">Tratamientos</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Ventanas/Combos">Combos</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Ventanas/Promociones">Promociones</a></li>
+                                    @if (admin || recep)
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" asp-page="/Ventanas/Sedes">Sedes</a></li>
-                                        @if (admin || recep)
-                                        {
-                                            <li><a class="dropdown-item" asp-page="/Ventanas/Barberos">Barberos</a></li>
-                                        }
-                                    </ul>
-                                </li>
-                            }
+                                    }
+                                </ul>
+                            </li>
 
+                            @* Personal: solo admin  *@
                             @if (admin)
                             {
                                 <li class="nav-item dropdown">
@@ -76,12 +86,81 @@
                                         <li><a class="dropdown-item" asp-page="/Ventanas/Barberos">Barberos</a></li>
                                         <li><a class="dropdown-item" asp-page="/Ventanas/Recepcionistas">Recepcionistas</a></li>
                                         <li><a class="dropdown-item" asp-page="/Ventanas/Administradores">Administradores</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/EmpleadosSedes">Empleados por Sede</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Horarios">Horarios</a></li>
+                                 
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Turnos">Turnos</a></li>
                                     </ul>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link @Activo("/Ventanas/Usuarios")" asp-page="/Ventanas/Usuarios">Usuarios</a>
+                            }
+
+                            @* Barbero: agenda y turnos  *@
+                            @if (barbero)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Mi agenda</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Turnos">Mis turnos</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Horarios">Mi horario</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Calificaciones">Mis calificaciones</a></li>
+                                    </ul>
                                 </li>
                             }
+
+                            @* Inventario: solo admin  *@
+                            @if (admin)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Inventario</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Productos">Productos</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Inventarios">Inventarios</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/InventarioProductos">Inventario Productos</a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                            @* Facturacion: admin, recepcionista y cliente  *@
+                            @if (admin || recep || cliente)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Facturación</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Pagos">Pagos</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Facturas">Facturas</a></li>
+                                        @if (admin || recep)
+                                        {
+                                            <li><a class="dropdown-item" asp-page="/Ventanas/Notificaciones">Notificaciones</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+
+                            @* Fidelizacion: admin y cliente  *@
+                            @if (admin || cliente)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Fidelización</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/PuntosFidelidad">Puntos de Fidelidad</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Calificaciones">Calificaciones</a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                            @* Admin extra: combo servicios y usuarios  *@
+                            @if (admin)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Sistema</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/Usuarios">Usuarios</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Ventanas/ComboServicios">Combo Servicios</a></li>
+                                    </ul>
+                                </li>
+                            }
+
                         </ul>
 
                         <div class="d-flex align-items-center gap-3">
@@ -105,7 +184,7 @@
 
     <footer class="bb-footer">
         <div class="container d-flex justify-content-between">
-            <span>&copy; 2026 · Barbería El Navaja</span>
+            <span>&copy; 2026 · Barbería BarberPro</span>
             <span class="text-tenue">Sistema de gestión</span>
         </div>
     </footer>

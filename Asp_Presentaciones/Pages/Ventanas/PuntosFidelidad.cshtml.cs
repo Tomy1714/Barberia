@@ -1,0 +1,71 @@
+using Asp_Presentaciones.Infraestructura;
+using LibPresentaciones.Implementaciones;
+using Lib_Negocio.Entidades;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Asp_Presentaciones.Pages.Ventanas
+{
+    public class PuntosFidelidadModel : PaginaBase
+    {
+        private readonly PuntosFidelidadPresentacion _negocio = new();
+
+        public List<PuntosFidelidad> Lista { get; private set; } = new();
+        public List<FilaAuditoria> Auditoria { get; private set; } = new();
+
+        [BindProperty] public PuntosFidelidad Item { get; set; } = new();
+        [TempData]     public string? Mensaje  { get; set; }
+        [TempData]     public string? ErrorMsg { get; set; }
+
+        public IActionResult OnGet()
+        {
+            var redir = ValidarAcceso("Administrador", "Cliente");
+            if (redir != null) return redir;
+            Cargar();
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostGuardarAsync()
+        {
+            var redir = ValidarAcceso("Administrador", "Cliente");
+            if (redir != null) return redir;
+            try
+            {
+                if (Item.IdPuntos == 0) await _negocio.Guardar(Item, RolActual);
+                else _negocio.Modificar(Item, RolActual);
+                Mensaje = "Puntos de Fidelidad guardado correctamente.";
+            }
+            catch (Exception ex) { ErrorMsg = ex.Message; }
+            return RedirectToPage();
+        }
+
+        public IActionResult OnPostEliminar()
+        {
+            var redir = ValidarAcceso("Administrador", "Cliente");
+            if (redir != null) return redir;
+            try
+            {
+                _negocio.Eliminar(Item, RolActual);
+                Mensaje = "Puntos de Fidelidad eliminado correctamente.";
+            }
+            catch (Exception ex) { ErrorMsg = ex.Message; }
+            return RedirectToPage();
+        }
+
+        private void Cargar()
+        {
+            try
+            {
+                Lista = _negocio.Consultar(RolActual) ?? new();
+                Auditoria = (_negocio.ConsultarAuditoria(RolActual) ?? new())
+                    .Select(a => new FilaAuditoria
+                    {
+                        IdAuditoria  = a.IdAuditoria,
+                        IdReferencia = a.IdPuntos,
+                        Accion       = a.Accion ?? "",
+                        Fecha        = a.Fecha
+                    }).ToList();
+            }
+            catch (Exception ex) { ErrorMsg = "No se pudo conectar con el API: " + ex.Message; }
+        }
+    }
+}

@@ -14,7 +14,7 @@ namespace Lib_Negocio.Entidades
         public DateTime FechaFin            { get; set; }
         public bool     Activa              { get; set; } = true;
 
-        // Navegacion
+        
 
 
         [ForeignKey(nameof(IdServicio))]

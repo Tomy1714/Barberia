@@ -76,10 +76,20 @@ namespace LibPresentaciones.Implementaciones
             var Url = datos["Url"].ToString();
             datos.Remove("Url");
 
+            var stringData = datos.ContainsKey("Entidad")
+                ? JsonConvert.SerializeObject(datos["Entidad"]) : "{}";
+
             var httpClient = new HttpClient();
             httpClient.Timeout = new TimeSpan(0, 4, 0);
 
-            var message = await httpClient.DeleteAsync(Url);
+            var request = new HttpRequestMessage(HttpMethod.Delete, Url)
+            {
+                Content = new StringContent(stringData,
+                              System.Text.Encoding.UTF8,
+                              "application/json")
+            };
+
+            var message = await httpClient.SendAsync(request);
 
             if (!message.IsSuccessStatusCode)
                 throw new Exception("Error al eliminar en el API");

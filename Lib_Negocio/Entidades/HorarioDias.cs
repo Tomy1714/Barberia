@@ -6,10 +6,10 @@ namespace Lib_Negocio.Entidades
     public class HorarioDias
     {
         [Key] public int    IdHorarioDia { get; set; }
-        public int    IdHorario    { get; set; }   // FK
+        public int    IdHorario    { get; set; }   
         public string Dia          { get; set; } = string.Empty;
 
-        // Navegacion
+       
 
 
         [ForeignKey(nameof(IdHorario))]

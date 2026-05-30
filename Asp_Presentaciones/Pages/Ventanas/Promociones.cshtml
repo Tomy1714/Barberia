@@ -1,0 +1,111 @@
+@page
+@model Asp_Presentaciones.Pages.Ventanas.PromocionesModel
+@{ ViewData["Title"] = "Promociones"; }
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 style="color:var(--bb-oro-claro);margin:0">Promociones</h1>
+        <p class="text-tenue mb-0">Descuentos y ofertas especiales</p>
+    </div>
+    <button class="btn btn-oro" onclick="bbAbrirModal('modalPromociones', null)">+ Agregar</button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
+@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tabReg">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <table class="bb-table">
+                <thead><tr><th>#</th>
+<th>Servicio</th>
+<th>Nombre</th>
+<th>Descuento %</th>
+<th>Inicio</th>
+<th>Fin</th>
+<th>Activa</th>
+<th class='acciones'>Acciones</th></tr></thead>
+                <tbody>
+                    @if (Model.Lista.Count == 0) { <tr><td colspan="8" class="text-tenue text-center py-4">Sin registros.</td></tr> }
+                    @foreach (var p in Model.Lista)
+                    {
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdPromocion, p.IdServicio, p.Nombre, p.PorcentajeDescuento, p.FechaInicio, p.FechaFin, p.Activa });
+                        <tr>
+                            <td>@p.IdPromocion</td>
+<td>@p.IdServicio</td>
+<td>@p.Nombre</td>
+<td>@p.PorcentajeDescuento</td>
+<td>@p.FechaInicio</td>
+<td>@p.FechaFin</td>
+<td>@p.Activa</td>
+                            <td class="acciones">
+                                <button class="btn btn-sm btn-fantasma" data-json="@json"
+                                    onclick="bbAbrirModal('modalPromociones', JSON.parse(this.dataset.json))">Editar</button>
+                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
+                                    <input type="hidden" name="Item.IdPromocion" value="@p.IdPromocion" />
+                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="tabAud">
+        <div class="bb-card"><div class="bb-card-body p-0">
+            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Promociones"))" />
+        </div></div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalPromociones" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="post" asp-page-handler="Guardar" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> promociones</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" asp-for="Item.IdPromocion" />
+                <div class="mb-3">
+                    <label class="form-label">IdServicio</label>
+                    <input asp-for="Item.IdServicio" type="number" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input asp-for="Item.Nombre" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Descripcion</label>
+                    <input asp-for="Item.Descripcion" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">PorcentajeDescuento</label>
+                    <input asp-for="Item.PorcentajeDescuento" type="number" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">FechaInicio</label>
+                    <input asp-for="Item.FechaInicio" type="date" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">FechaFin</label>
+                    <input asp-for="Item.FechaFin" type="date" class="form-control" />
+                </div>
+                <div class="mb-3 form-check">
+                    <input asp-for="Item.Activa" type="checkbox" class="form-check-input" />
+                    <label class="form-check-label">Activa</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-oro">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
