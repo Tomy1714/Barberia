@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Asp_Presentaciones.Infraestructura
 {
-    /// <summary>
-    /// Acceso tipado a los datos del usuario guardados en la sesion tras el login.
-    /// </summary>
+
     public static class Sesion
     {
         public const string ClaveRol      = "Rol";

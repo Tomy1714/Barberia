@@ -1,89 +1,201 @@
 @page
 @model Asp_Presentaciones.Pages.Ventanas.CombosModel
-@{ ViewData["Title"] = "Combos"; }
+@{
+    ViewData["Title"] = "Combos"; bool admin = Model.EsAdministrador;
+}
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Combos</h1>
-        <p class="text-tenue mb-0">Paquetes de servicios con descuento especial</p>
+        <p class="text-tenue mb-0">Paquetes de corte + tratamiento con descuento especial</p>
     </div>
-    <button class="btn btn-oro" onclick="bbAbrirModal('modalCombos', null)">+ Agregar</button>
+    @if (admin)
+    {
+        <button class="btn btn-oro" onclick="bbAbrirModal('modalCombos', null)">+ Agregar combo</button>
+    }
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
-@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success py-2">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
+}
+
+@* Resultado calculo *@
+@if (Model.PrecioFinalCalculado.HasValue)
+{
+    <div class="alert alert-info py-2">
+        <strong>@Model.InfoCombo</strong><br />
+        Precio final con descuento: <strong>$@Model.PrecioFinalCalculado.Value.ToString("N0")</strong>
+        &nbsp;·&nbsp;
+        Ahorro: <strong style="color:var(--bb-oro-claro)">$@Model.AhorroCalculado!.Value.ToString("N0")</strong>
+    </div>
+}
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    @if (admin)
+    {
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    }
 </ul>
 
 <div class="tab-content">
     <div class="tab-pane fade show active" id="tabReg">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <table class="bb-table">
-                <thead><tr><th>#</th>
-<th>ID Servicio</th>
-<th>Descuento %</th>
-<th>Descripción</th>
-<th class='acciones'>Acciones</th></tr></thead>
-                <tbody>
-                    @if (Model.Lista.Count == 0) { <tr><td colspan="5" class="text-tenue text-center py-4">Sin registros.</td></tr> }
-                    @foreach (var p in Model.Lista)
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdCombo, p.IdServicio, p.DescuentoCombo, p.Descripcion });
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <table class="bb-table">
+                    <thead>
                         <tr>
-                            <td>@p.IdCombo</td>
-<td>@p.IdServicio</td>
-<td>@p.DescuentoCombo</td>
-<td>@p.Descripcion</td>
-                            <td class="acciones">
-                                <button class="btn btn-sm btn-fantasma" data-json="@json"
-                                    onclick="bbAbrirModal('modalCombos', JSON.parse(this.dataset.json))">Editar</button>
-                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                    <input type="hidden" name="Item.IdCombo" value="@p.IdCombo" />
-                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                </form>
-                            </td>
+                            <th>#</th>
+                            <th>Descripción</th>
+                            <th>Descuento</th>
+                            <th class="acciones">Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+                    </thead>
+                    <tbody>
+                        @if (Model.Lista.Count == 0)
+                        {
+                            <tr><td colspan="4" class="text-tenue text-center py-4">Sin combos registrados.</td></tr>
+                        }
+                        @foreach (var p in Model.Lista)
+                        {
+                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                            {
+                                p.IdCombo,
+                                p.IdServicio,
+                                p.DescuentoCombo,
+                                p.Descripcion
+                            });
+                            <tr>
+                                <td>@p.IdCombo</td>
+                                <td>
+                                    <strong>@p.Descripcion</strong>
+                                    <br /><small class="text-tenue">Servicio base: @Model.NombreServicio(p.IdServicio)</small>
+                                </td>
+                                <td><span class="estado activo">@p.DescuentoCombo%</span></td>
+                                <td class="acciones">
+                                    @* Boton calcular precio *@
+                                    <form method="post" asp-page-handler="CalcularPrecio" class="d-inline">
+                                        <input type="hidden" name="Item.IdCombo" value="@p.IdCombo" />
+                                        <input type="hidden" name="Item.IdServicio" value="@p.IdServicio" />
+                                        <input type="hidden" name="Item.DescuentoCombo" value="@p.DescuentoCombo" />
+                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-oro-claro)">
+                                            Precio
+                                        </button>
+                                    </form>
+                                    @if (admin)
+                                    {
+                                        <button class="btn btn-sm btn-fantasma" data-json="@json"
+                                                onclick="bbAbrirModal('modalCombos', JSON.parse(this.dataset.json))">
+                                            Editar
+                                        </button>
+                                        <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                              onsubmit="return bbConfirmarBorrado(event)">
+                                            <input type="hidden" name="Item.IdCombo" value="@p.IdCombo" />
+                                            <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="tab-pane fade" id="tabAud">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Combos"))" />
-        </div></div>
-    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card">
+                <div class="bb-card-body p-0">
+                    <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Combo"))" />
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
-<div class="modal fade" id="modalCombos" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="post" asp-page-handler="Guardar" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> combos</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" asp-for="Item.IdCombo" />
-                <div class="mb-3">
-                    <label class="form-label">IdServicio</label>
-                    <input asp-for="Item.IdServicio" type="number" class="form-control" />
+@if (admin)
+{
+    <div class="modal fade" id="modalCombos" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> combo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">DescuentoCombo</label>
-                    <input asp-for="Item.DescuentoCombo" type="number" class="form-control" />
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdCombo" />
+
+                    @* Dropdown cortes *@
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Servicio de corte
+                        </label>
+                        <select asp-for="IdServicioCorte" class="form-select" required>
+                            <option value="">— Seleccione un corte —</option>
+                            @foreach (var c in Model.ListaCortes)
+                            {
+                                var svc = Model.ListaServicios.FirstOrDefault(s => s.IdServicio == c.IdServicio);
+                                <option value="@c.IdServicioCorte">
+                                    @(svc?.Nombre ?? "Corte") — @c.TipoCorte
+                                    @(c.IncluyeBarba ? "✚ barba" : "")
+                                    — $@(svc?.PrecioBase.ToString("N0") ?? "0")
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    @* Dropdown tratamientos *@
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Tratamiento capilar
+                        </label>
+                        <select asp-for="IdServicioTrat" class="form-select" required>
+                            <option value="">— Seleccione un tratamiento —</option>
+                            @foreach (var t in Model.ListaTratamientos)
+                            {
+                                var svc = Model.ListaServicios.FirstOrDefault(s => s.IdServicio == t.IdServicio);
+                                <option value="@t.IdServicioTratamiento">
+                                    @(svc?.Nombre ?? "Tratamiento") — @t.TipoTratamiento
+                                    — $@(svc?.PrecioBase.ToString("N0") ?? "0")
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Descuento del combo
+                            <small class="text-tenue">(1% al 100%)</small>
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="Item.DescuentoCombo" type="number"
+                                   min="1" max="100" step="0.5" class="form-control" required />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción del combo</label>
+                        <input asp-for="Item.Descripcion" class="form-control"
+                               placeholder="Ej: Corte degradado + hidratación" />
+                        <small class="text-tenue">Si lo dejas vacío se genera automáticamente.</small>
+                    </div>
+
+                    <div class="alert alert-info py-2 mb-0" style="font-size:0.85rem">
+                        El precio final = <strong>(Precio corte + Precio tratamiento) × (1 - Descuento%)</strong>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Descripcion</label>
-                    <input asp-for="Item.Descripcion" type="text" class="form-control" />
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Guardar combo</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-oro">Guardar</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
+}

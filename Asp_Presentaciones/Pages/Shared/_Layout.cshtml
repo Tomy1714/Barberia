@@ -42,17 +42,17 @@
                     <div class="collapse navbar-collapse" id="navMain">
                         <ul class="navbar-nav me-auto">
 
-                            @* Inicio  *@
+                         
                             <li class="nav-item">
                                 <a class="nav-link @Activo("/Index")" asp-page="/Index">Inicio</a>
                             </li>
 
-                            @* Citas: todos los roles  *@
+                        
                             <li class="nav-item">
                                 <a class="nav-link @Activo("/Ventanas/Citas")" asp-page="/Ventanas/Citas">Citas</a>
                             </li>
 
-                            @* Clientes: admin y recepcionista  *@
+                         
                             @if (admin || recep)
                             {
                                 <li class="nav-item">
@@ -61,7 +61,7 @@
                                 </li>
                             }
 
-                            @* Catalogo: servicios visibles para todos  *@
+                         
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Catálogo</a>
                                 <ul class="dropdown-menu">
@@ -78,7 +78,7 @@
                                 </ul>
                             </li>
 
-                            @* Personal: solo admin  *@
+                       
                             @if (admin)
                             {
                                 <li class="nav-item dropdown">
@@ -99,7 +99,7 @@
                                 </li>
                             }
 
-                            @* Barbero: agenda y turnos  *@
+                        
                             @if (barbero)
                             {
                                 <li class="nav-item dropdown">
@@ -112,7 +112,7 @@
                                 </li>
                             }
 
-                            @* Inventario: solo admin  *@
+                          
                             @if (admin)
                             {
                                 <li class="nav-item dropdown">
@@ -125,7 +125,7 @@
                                 </li>
                             }
 
-                            @* Facturacion: admin, recepcionista y cliente  *@
+                        
                             @if (admin || recep || cliente)
                             {
                                 <li class="nav-item dropdown">
@@ -141,7 +141,7 @@
                                 </li>
                             }
 
-                            @* Fidelizacion: admin y cliente  *@
+                          
                             @if (admin || cliente)
                             {
                                 <li class="nav-item dropdown">
@@ -153,7 +153,7 @@
                                 </li>
                             }
 
-                            @* Admin extra: combo servicios y usuarios  *@
+                   
                             @if (admin)
                             {
                                 <li class="nav-item dropdown">

@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Asp_Presentaciones.Infraestructura
 {
-    /// <summary>
-    /// Base de las paginas seguras: expone datos de sesion y valida el rol.
-    /// </summary>
+
     public abstract class PaginaBase : PageModel
     {
         public string RolActual    => Sesion.Rol(HttpContext.Session);
@@ -19,11 +17,7 @@ namespace Asp_Presentaciones.Infraestructura
         public bool EsBarbero       => RolActual == "Barbero";
         public bool EsCliente       => RolActual == "Cliente";
 
-        /// <summary>
-        /// Devuelve un redirect si el usuario no esta autenticado o su rol no esta
-        /// dentro de los permitidos; null si tiene acceso. Si no se pasan roles,
-        /// solo exige sesion iniciada.
-        /// </summary>
+
         protected IActionResult? ValidarAcceso(params string[] rolesPermitidos)
         {
             if (!Autenticado)

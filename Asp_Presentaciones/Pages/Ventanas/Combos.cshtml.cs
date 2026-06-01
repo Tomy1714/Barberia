@@ -10,11 +10,22 @@ namespace Asp_Presentaciones.Pages.Ventanas
         private readonly CombosPresentacion _negocio = new();
 
         public List<Combos> Lista { get; private set; } = new();
+        public List<ServiciosCorte> ListaCortes { get; private set; } = new();
+        public List<ServiciosTratamiento> ListaTratamientos { get; private set; } = new();
+        public List<Servicios> ListaServicios { get; private set; } = new();
+        public List<ComboServicios> ListaComboServicios { get; private set; } = new();
         public List<FilaAuditoria> Auditoria { get; private set; } = new();
 
         [BindProperty] public Combos Item { get; set; } = new();
-        [TempData]     public string? Mensaje  { get; set; }
-        [TempData]     public string? ErrorMsg { get; set; }
+        [BindProperty] public int IdServicioCorte { get; set; }
+        [BindProperty] public int IdServicioTrat { get; set; }
+        [TempData] public string? Mensaje { get; set; }
+        [TempData] public string? ErrorMsg { get; set; }
+
+        // Resultado calculo
+        public decimal? PrecioFinalCalculado { get; private set; }
+        public decimal? AhorroCalculado { get; private set; }
+        public string InfoCombo { get; private set; } = "";
 
         public IActionResult OnGet()
         {
@@ -30,9 +41,60 @@ namespace Asp_Presentaciones.Pages.Ventanas
             if (redir != null) return redir;
             try
             {
-                if (Item.IdCombo == 0) await _negocio.Guardar(Item, RolActual);
-                else _negocio.Modificar(Item, RolActual);
-                Mensaje = "Combos guardado correctamente.";
+                if (IdServicioCorte == 0 || IdServicioTrat == 0)
+                    throw new Exception("Debes seleccionar un corte y un tratamiento.");
+
+                if (Item.DescuentoCombo < 1 || Item.DescuentoCombo > 100)
+                    throw new Exception("El descuento debe estar entre 1% y 100%.");
+
+                Cargar();
+
+                // Obtener precio base del corte
+                var corte = ListaCortes.FirstOrDefault(c => c.IdServicioCorte == IdServicioCorte);
+                if (corte == null) throw new Exception("Corte no encontrado.");
+                var servCorte = ListaServicios.FirstOrDefault(s => s.IdServicio == corte.IdServicio);
+                if (servCorte == null) throw new Exception("Servicio de corte no encontrado.");
+
+                // Obtener precio base del tratamiento
+                var trat = ListaTratamientos.FirstOrDefault(t => t.IdServicioTratamiento == IdServicioTrat);
+                if (trat == null) throw new Exception("Tratamiento no encontrado.");
+                var servTrat = ListaServicios.FirstOrDefault(s => s.IdServicio == trat.IdServicio);
+                if (servTrat == null) throw new Exception("Servicio de tratamiento no encontrado.");
+
+                // Precio base = suma de los dos servicios
+                decimal precioTotal = servCorte.PrecioBase + servTrat.PrecioBase;
+
+                // Asignar al combo — usamos IdServicio del corte como referencia principal
+                Item.IdServicio = corte.IdServicio;
+                Item.Descripcion = string.IsNullOrEmpty(Item.Descripcion)
+                    ? $"{servCorte.Nombre} + {servTrat.Nombre}"
+                    : Item.Descripcion;
+
+                // Guardar combo
+                Combos comboGuardado;
+                if (Item.IdCombo == 0)
+                    comboGuardado = await _negocio.Guardar(Item, RolActual);
+                else
+                {
+                    comboGuardado = _negocio.Modificar(Item, RolActual);
+                }
+
+                // Guardar relacion ComboServicios para el corte
+                var csCorte = new CombosPresentacion();
+                var comboServCorte = new ComboServicios
+                {
+                    IdCombo = comboGuardado.IdCombo,
+                    IdServicio = corte.IdServicio
+                };
+                var comboServTrat = new ComboServicios
+                {
+                    IdCombo = comboGuardado.IdCombo,
+                    IdServicio = trat.IdServicio
+                };
+                await new ComboServiciosPresentacion().Guardar(comboServCorte, RolActual);
+                await new ComboServiciosPresentacion().Guardar(comboServTrat, RolActual);
+
+                Mensaje = $"Combo guardado: {Item.Descripcion} — Precio base: ${precioTotal:N0} con {Item.DescuentoCombo}% descuento.";
             }
             catch (Exception ex) { ErrorMsg = ex.Message; }
             return RedirectToPage();
@@ -45,10 +107,65 @@ namespace Asp_Presentaciones.Pages.Ventanas
             try
             {
                 _negocio.Eliminar(Item, RolActual);
-                Mensaje = "Combos eliminado correctamente.";
+                Mensaje = "Combo eliminado correctamente.";
             }
             catch (Exception ex) { ErrorMsg = ex.Message; }
             return RedirectToPage();
+        }
+
+        // Calcula precio final con descuento
+        public IActionResult OnPostCalcularPrecio()
+        {
+            var redir = ValidarAcceso("Administrador", "Recepcionista", "Barbero", "Cliente");
+            if (redir != null) return redir;
+            try
+            {
+                Cargar();
+
+                // Obtener servicios del combo desde ComboServicios
+                var serviciosDelCombo = ListaComboServicios
+                    .Where(cs => cs.IdCombo == Item.IdCombo)
+                    .Select(cs => ListaServicios.FirstOrDefault(s => s.IdServicio == cs.IdServicio))
+                    .Where(s => s != null)
+                    .ToList();
+
+                if (!serviciosDelCombo.Any())
+                {
+                    // Si no hay registros en ComboServicios usar IdServicio del combo
+                    var servBase = ListaServicios.FirstOrDefault(s => s.IdServicio == Item.IdServicio);
+                    if (servBase != null) serviciosDelCombo.Add(servBase);
+                }
+
+                decimal precioBase = serviciosDelCombo.Sum(s => s!.PrecioBase);
+                PrecioFinalCalculado = precioBase * (1 - Item.DescuentoCombo / 100);
+                AhorroCalculado = precioBase - PrecioFinalCalculado;
+                InfoCombo = string.Join(" + ", serviciosDelCombo.Select(s => s!.Nombre));
+            }
+            catch (Exception ex) { ErrorMsg = ex.Message; }
+            return Page();
+        }
+
+        // Nombre para mostrar en tabla
+        public string NombreServicio(int idServicio)
+        {
+            var s = ListaServicios.FirstOrDefault(x => x.IdServicio == idServicio);
+            return s == null ? $"#{idServicio}" : s.Nombre;
+        }
+
+        public string NombreCorte(int idServicioCorte)
+        {
+            var c = ListaCortes.FirstOrDefault(x => x.IdServicioCorte == idServicioCorte);
+            if (c == null) return "";
+            var s = ListaServicios.FirstOrDefault(x => x.IdServicio == c.IdServicio);
+            return s == null ? $"Corte #{idServicioCorte}" : $"{s.Nombre} ({c.TipoCorte})";
+        }
+
+        public string NombreTratamiento(int idServicioTrat)
+        {
+            var t = ListaTratamientos.FirstOrDefault(x => x.IdServicioTratamiento == idServicioTrat);
+            if (t == null) return "";
+            var s = ListaServicios.FirstOrDefault(x => x.IdServicio == t.IdServicio);
+            return s == null ? $"Tratamiento #{idServicioTrat}" : $"{s.Nombre} ({t.TipoTratamiento})";
         }
 
         private void Cargar()
@@ -56,14 +173,19 @@ namespace Asp_Presentaciones.Pages.Ventanas
             try
             {
                 Lista = _negocio.Consultar(RolActual) ?? new();
-                Auditoria = (_negocio.ConsultarAuditoria(RolActual) ?? new())
-                    .Select(a => new FilaAuditoria
-                    {
-                        IdAuditoria  = a.IdAuditoria,
-                        IdReferencia = a.IdCombo,
-                        Accion       = a.Accion ?? "",
-                        Fecha        = a.Fecha
-                    }).ToList();
+                ListaCortes = new ServiciosCortePresentacion().Consultar(RolActual) ?? new();
+                ListaTratamientos = new ServiciosTratamientoPresentacion().Consultar(RolActual) ?? new();
+                ListaServicios = new ServiciosPresentacion().Consultar(RolActual) ?? new();
+                ListaComboServicios = new ComboServiciosPresentacion().Consultar(RolActual) ?? new();
+                if (EsAdministrador)
+                    Auditoria = (_negocio.ConsultarAuditoria(RolActual) ?? new())
+                        .Select(a => new FilaAuditoria
+                        {
+                            IdAuditoria = a.IdAuditoria,
+                            IdReferencia = a.IdCombo,
+                            Accion = a.Accion ?? "",
+                            Fecha = a.Fecha
+                        }).ToList();
             }
             catch (Exception ex) { ErrorMsg = "No se pudo conectar con el API: " + ex.Message; }
         }
