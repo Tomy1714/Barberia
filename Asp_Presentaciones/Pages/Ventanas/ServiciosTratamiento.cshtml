@@ -1,95 +1,185 @@
 @page
 @model Asp_Presentaciones.Pages.Ventanas.ServiciosTratamientoModel
-@{ ViewData["Title"] = "Tratamientos Capilares"; }
+@{
+    ViewData["Title"] = "Tratamientos Capilares"; bool admin = Model.EsAdministrador;
+}
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Tratamientos Capilares</h1>
         <p class="text-tenue mb-0">Servicios de tratamiento y cuidado capilar</p>
     </div>
-    <button class="btn btn-oro" onclick="bbAbrirModal('modalServiciosTratamiento', null)">+ Agregar</button>
+    @if (admin)
+    {
+        <button class="btn btn-oro" onclick="bbAbrirModal('modalServiciosTratamiento', null)">+ Agregar tratamiento</button>
+    }
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
-@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success py-2">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
+}
+
+@* Resultado calculo precio final *@
+@if (Model.PrecioFinalCalculado.HasValue)
+{
+    <div class="alert alert-info py-2">
+        Precio final para <strong>@Model.NombreTratamiento</strong>:
+        <strong>$@Model.PrecioFinalCalculado.Value.ToString("N0")</strong>
+        <small class="text-tenue">(PrecioBase + CostoProducto × Sesiones)</small>
+    </div>
+}
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    @if (admin)
+    {
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    }
 </ul>
 
 <div class="tab-content">
     <div class="tab-pane fade show active" id="tabReg">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <table class="bb-table">
-                <thead><tr><th>#</th>
-<th>ID Servicio</th>
-<th>Tipo</th>
-<th>Costo Producto</th>
-<th>Sesiones</th>
-<th class='acciones'>Acciones</th></tr></thead>
-                <tbody>
-                    @if (Model.Lista.Count == 0) { <tr><td colspan="6" class="text-tenue text-center py-4">Sin registros.</td></tr> }
-                    @foreach (var p in Model.Lista)
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdServicioTratamiento, p.IdServicio, p.TipoTratamiento, p.CostoProducto, p.SesionesRequeridas });
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <table class="bb-table">
+                    <thead>
                         <tr>
-                            <td>@p.IdServicioTratamiento</td>
-<td>@p.IdServicio</td>
-<td>@p.TipoTratamiento</td>
-<td>@p.CostoProducto</td>
-<td>@p.SesionesRequeridas</td>
-                            <td class="acciones">
-                                <button class="btn btn-sm btn-fantasma" data-json="@json"
-                                    onclick="bbAbrirModal('modalServiciosTratamiento', JSON.parse(this.dataset.json))">Editar</button>
-                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                    <input type="hidden" name="Item.IdServicioTratamiento" value="@p.IdServicioTratamiento" />
-                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                </form>
-                            </td>
+                            <th>#</th>
+                            <th>Servicio base</th>
+                            <th>Tipo tratamiento</th>
+                            <th>Costo producto</th>
+                            <th>Sesiones</th>
+                            <th class="acciones">Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+                    </thead>
+                    <tbody>
+                        @if (Model.Lista.Count == 0)
+                        {
+                            <tr><td colspan="6" class="text-tenue text-center py-4">Sin tratamientos registrados.</td></tr>
+                        }
+                        @foreach (var p in Model.Lista)
+                        {
+                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                            {
+                                p.IdServicioTratamiento,
+                                p.IdServicio,
+                                p.TipoTratamiento,
+                                p.CostoProducto,
+                                p.SesionesRequeridas
+                            });
+                            <tr>
+                                <td>@p.IdServicioTratamiento</td>
+                                <td>@Model.NombreServicio(p.IdServicio)</td>
+                                <td>@p.TipoTratamiento</td>
+                                <td>$@p.CostoProducto.ToString("N0")</td>
+                                <td>@p.SesionesRequeridas sesión(es)</td>
+                                <td class="acciones">
+                                    @* Boton calcular precio final *@
+                                    <form method="post" asp-page-handler="CalcularPrecio" class="d-inline">
+                                        <input type="hidden" name="Item.IdServicioTratamiento" value="@p.IdServicioTratamiento" />
+                                        <input type="hidden" name="Item.IdServicio" value="@p.IdServicio" />
+                                        <input type="hidden" name="Item.TipoTratamiento" value="@p.TipoTratamiento" />
+                                        <input type="hidden" name="Item.CostoProducto" value="@p.CostoProducto" />
+                                        <input type="hidden" name="Item.SesionesRequeridas" value="@p.SesionesRequeridas" />
+                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-oro-claro)">
+                                            Precio final
+                                        </button>
+                                    </form>
+                                    @if (admin)
+                                    {
+                                        <button class="btn btn-sm btn-fantasma" data-json="@json"
+                                                onclick="bbAbrirModal('modalServiciosTratamiento', JSON.parse(this.dataset.json))">
+                                            Editar
+                                        </button>
+                                        <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                              onsubmit="return bbConfirmarBorrado(event)">
+                                            <input type="hidden" name="Item.IdServicioTratamiento" value="@p.IdServicioTratamiento" />
+                                            <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="tab-pane fade" id="tabAud">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "ServiciosTratamiento"))" />
-        </div></div>
-    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card">
+                <div class="bb-card-body p-0">
+                    <partial name="_AuditoriaTab" model="@((Model.Auditoria, "ServicioTratamiento"))" />
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
-<div class="modal fade" id="modalServiciosTratamiento" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="post" asp-page-handler="Guardar" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> tratamientos capilares</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" asp-for="Item.IdServicioTratamiento" />
-                <div class="mb-3">
-                    <label class="form-label">IdServicio</label>
-                    <input asp-for="Item.IdServicio" type="number" class="form-control" />
+@if (admin)
+{
+    <div class="modal fade" id="modalServiciosTratamiento" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> tratamiento capilar</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">TipoTratamiento</label>
-                    <input asp-for="Item.TipoTratamiento" type="text" class="form-control" />
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdServicioTratamiento" />
+
+                    @* Dropdown con servicios reales *@
+                    <div class="mb-3">
+                        <label class="form-label">Servicio base</label>
+                        <select asp-for="Item.IdServicio" class="form-select" required>
+                            <option value="">— Seleccione un servicio —</option>
+                            @foreach (var s in Model.Servicios)
+                            {
+                                <option value="@s.IdServicio">
+                                    @s.Nombre — $@s.PrecioBase.ToString("N0") (@s.DuracionMinutos min)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de tratamiento</label>
+                        <input asp-for="Item.TipoTratamiento" class="form-control"
+                               placeholder="Ej: Hidratación, Keratina, Alisado..." required />
+                    </div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label class="form-label">
+                                Costo del producto
+                                <small class="text-tenue">por sesión</small>
+                            </label>
+                            <input asp-for="Item.CostoProducto" type="number"
+                                   min="0" step="500" class="form-control" required />
+                        </div>
+                        <div class="col mb-3">
+                            <label class="form-label">Sesiones requeridas</label>
+                            <input asp-for="Item.SesionesRequeridas" type="number"
+                                   min="1" max="20" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info py-2 mb-0" style="font-size:0.85rem">
+                          Precio final:
+                        <strong>PrecioBase + (CostoProducto × Sesiones)</strong>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">CostoProducto</label>
-                    <input asp-for="Item.CostoProducto" type="number" class="form-control" />
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Guardar</button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">SesionesRequeridas</label>
-                    <input asp-for="Item.SesionesRequeridas" type="number" class="form-control" />
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-oro">Guardar</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
+}

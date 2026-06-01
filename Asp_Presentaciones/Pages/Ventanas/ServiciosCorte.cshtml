@@ -1,101 +1,185 @@
-@page
+﻿@page
 @model Asp_Presentaciones.Pages.Ventanas.ServiciosCorteModel
-@{ ViewData["Title"] = "Servicios de Corte"; }
+@{
+    ViewData["Title"] = "Servicios de Corte"; bool admin = Model.EsAdministrador;
+}
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Servicios de Corte</h1>
-        <p class="text-tenue mb-0">Cortes de cabello y barba</p>
+        <p class="text-tenue mb-0">Cortes de cabello y barba · el recargo se calcula automáticamente según el nivel</p>
     </div>
-    <button class="btn btn-oro" onclick="bbAbrirModal('modalServiciosCorte', null)">+ Agregar</button>
+    @if (admin)
+    {
+        <button class="btn btn-oro" onclick="bbAbrirModal('modalServiciosCorte', null)">+ Agregar corte</button>
+    }
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
-@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success py-2">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
+}
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    @if (admin)
+    {
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    }
 </ul>
 
 <div class="tab-content">
     <div class="tab-pane fade show active" id="tabReg">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <table class="bb-table">
-                <thead><tr><th>#</th>
-<th>ID Servicio</th>
-<th>Tipo Corte</th>
-<th>Barba</th>
-<th>Complejidad</th>
-<th>Recargo</th>
-<th class='acciones'>Acciones</th></tr></thead>
-                <tbody>
-                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin registros.</td></tr> }
-                    @foreach (var p in Model.Lista)
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdServicioCorte, p.IdServicio, p.TipoCorte, p.IncluyeBarba, p.NivelComplejidad, p.RecargoComplejidad });
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <table class="bb-table">
+                    <thead>
                         <tr>
-                            <td>@p.IdServicioCorte</td>
-<td>@p.IdServicio</td>
-<td>@p.TipoCorte</td>
-<td>@p.IncluyeBarba</td>
-<td>@p.NivelComplejidad</td>
-<td>@p.RecargoComplejidad</td>
-                            <td class="acciones">
-                                <button class="btn btn-sm btn-fantasma" data-json="@json"
-                                    onclick="bbAbrirModal('modalServiciosCorte', JSON.parse(this.dataset.json))">Editar</button>
-                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                    <input type="hidden" name="Item.IdServicioCorte" value="@p.IdServicioCorte" />
-                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                </form>
-                            </td>
+                            <th>#</th>
+                            <th>Servicio base</th>
+                            <th>Tipo corte</th>
+                            <th>Barba</th>
+                            <th>Complejidad</th>
+                            <th>Recargo</th>
+                            @if (admin)
+                            {
+                                <th class="acciones">Acciones</th>
+                            }
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+                    </thead>
+                    <tbody>
+                        @if (Model.Lista.Count == 0)
+                        {
+                            <tr><td colspan="7" class="text-tenue text-center py-4">Sin cortes registrados.</td></tr>
+                        }
+                        @foreach (var p in Model.Lista)
+                        {
+                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                            {
+                                p.IdServicioCorte,
+                                p.IdServicio,
+                                p.TipoCorte,
+                                p.IncluyeBarba,
+                                p.NivelComplejidad,
+                                p.RecargoComplejidad
+                            });
+                            <tr>
+                                <td>@p.IdServicioCorte</td>
+                                <td>@Model.NombreServicio(p.IdServicio)</td>
+                                <td>@p.TipoCorte</td>
+                                <td>
+                                    <span class="estado @(p.IncluyeBarba ? "activo" : "inactivo")">
+                                        @(p.IncluyeBarba ? "Sí" : "No")
+                                    </span>
+                                </td>
+                                <td>
+                                    @* Mostrar nivel con estrellas *@
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span style="color:@(i <= p.NivelComplejidad ? "var(--bb-oro-claro)" : "#555")">★</span>
+                                    }
+                                    (@p.NivelComplejidad/5)
+                                </td>
+                                <td>$@p.RecargoComplejidad.ToString("N0")</td>
+                                @if (admin)
+                                {
+                                    <td class="acciones">
+                                        <button class="btn btn-sm btn-fantasma" data-json="@json"
+                                                onclick="bbAbrirModal('modalServiciosCorte', JSON.parse(this.dataset.json))">
+                                            Editar
+                                        </button>
+                                        <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                              onsubmit="return bbConfirmarBorrado(event)">
+                                            <input type="hidden" name="Item.IdServicioCorte" value="@p.IdServicioCorte" />
+                                            <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                        </form>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="tab-pane fade" id="tabAud">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "ServiciosCorte"))" />
-        </div></div>
-    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card">
+                <div class="bb-card-body p-0">
+                    <partial name="_AuditoriaTab" model="@((Model.Auditoria, "ServicioCorte"))" />
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
-<div class="modal fade" id="modalServiciosCorte" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="post" asp-page-handler="Guardar" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> servicios de corte</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" asp-for="Item.IdServicioCorte" />
-                <div class="mb-3">
-                    <label class="form-label">IdServicio</label>
-                    <input asp-for="Item.IdServicio" type="number" class="form-control" />
+@if (admin)
+{
+    <div class="modal fade" id="modalServiciosCorte" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> servicio de corte</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">TipoCorte</label>
-                    <input asp-for="Item.TipoCorte" type="text" class="form-control" />
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdServicioCorte" />
+
+                    @* Dropdown con servicios reales *@
+                    <div class="mb-3">
+                        <label class="form-label">Servicio base</label>
+                        <select asp-for="Item.IdServicio" class="form-select" required>
+                            <option value="">— Seleccione un servicio —</option>
+                            @foreach (var s in Model.Servicios)
+                            {
+                                <option value="@s.IdServicio">@s.Nombre — $@s.PrecioBase.ToString("N0") (@s.DuracionMinutos min)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de corte</label>
+                        <input asp-for="Item.TipoCorte" class="form-control"
+                               placeholder="Ej: Clásico, Degradado, Mohicano..." required />
+                    </div>
+
+                    @* Nivel 1-5 con nota de recargo automático *@
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Nivel de complejidad
+                            <small class="text-tenue">(1 al 5 · recargo automático: nivel × $5.000)</small>
+                        </label>
+                        <input asp-for="Item.NivelComplejidad" type="number"
+                               min="1" max="5" class="form-control" required
+                               placeholder="1 = básico · 5 = muy complejo" />
+                    </div>
+
+                    @* Recargo solo lectura, se calcula en el backend *@
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Recargo por complejidad
+                            <small class="text-tenue">(se calcula automáticamente)</small>
+                        </label>
+                        <input asp-for="Item.RecargoComplejidad" type="number"
+                               class="form-control" readonly
+                               placeholder="Se calcula al guardar" />
+                    </div>
+
+                    <div class="form-check">
+                        <input asp-for="Item.IncluyeBarba" type="checkbox" class="form-check-input" />
+                        <label class="form-check-label">Incluye arreglo de barba</label>
+                    </div>
                 </div>
-                <div class="mb-3 form-check">
-                    <input asp-for="Item.IncluyeBarba" type="checkbox" class="form-check-input" />
-                    <label class="form-check-label">IncluyeBarba</label>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Guardar</button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">NivelComplejidad</label>
-                    <input asp-for="Item.NivelComplejidad" type="number" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">RecargoComplejidad</label>
-                    <input asp-for="Item.RecargoComplejidad" type="number" class="form-control" />
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-oro">Guardar</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
+}
