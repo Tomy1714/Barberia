@@ -24,7 +24,7 @@
     <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
 }
 
-@* Resultado calculo *@
+
 @if (Model.PrecioFinalCalculado.HasValue)
 {
     <div class="alert alert-info py-2">
@@ -78,7 +78,7 @@
                                 </td>
                                 <td><span class="estado activo">@p.DescuentoCombo%</span></td>
                                 <td class="acciones">
-                                    @* Boton calcular precio *@
+                                   
                                     <form method="post" asp-page-handler="CalcularPrecio" class="d-inline">
                                         <input type="hidden" name="Item.IdCombo" value="@p.IdCombo" />
                                         <input type="hidden" name="Item.IdServicio" value="@p.IdServicio" />
@@ -131,7 +131,7 @@
                 <div class="modal-body">
                     <input type="hidden" asp-for="Item.IdCombo" />
 
-                    @* Dropdown cortes *@
+              
                     <div class="mb-3">
                         <label class="form-label">
                             Servicio de corte
@@ -143,14 +143,14 @@
                                 var svc = Model.ListaServicios.FirstOrDefault(s => s.IdServicio == c.IdServicio);
                                 <option value="@c.IdServicioCorte">
                                     @(svc?.Nombre ?? "Corte") — @c.TipoCorte
-                                    @(c.IncluyeBarba ? "✚ barba" : "")
+                                    @(c.IncluyeBarba ? "+ barba" : "")
                                     — $@(svc?.PrecioBase.ToString("N0") ?? "0")
                                 </option>
                             }
                         </select>
                     </div>
 
-                    @* Dropdown tratamientos *@
+                  
                     <div class="mb-3">
                         <label class="form-label">
                             Tratamiento capilar

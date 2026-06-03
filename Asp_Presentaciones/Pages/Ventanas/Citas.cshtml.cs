@@ -13,11 +13,15 @@ namespace Asp_Presentaciones.Pages.Ventanas
         public List<Clientes> Clientes { get; private set; } = new();
         public List<Barberos> Barberos { get; private set; } = new();
         public List<Servicios> Servicios { get; private set; } = new();
+        public List<ServiciosCorte> ServiciosCorte { get; private set; } = new();
+        public List<ServiciosTratamiento> ServiciosTrat { get; private set; } = new();
+        public List<Combos> Combos { get; private set; } = new();
         public List<Personas> Personas { get; private set; } = new();
         public List<Empleados> Empleados { get; private set; } = new();
         public List<FilaAuditoria> Auditoria { get; private set; } = new();
 
-        public static readonly string[] Estados = { "Pendiente", "Confirmada", "EnProceso", "Completada", "Cancelada" };
+        public static readonly string[] Estados =
+            { "Pendiente","Completada" };
 
         [BindProperty] public Citas Item { get; set; } = new();
         [TempData] public string? Mensaje { get; set; }
@@ -54,25 +58,25 @@ namespace Asp_Presentaciones.Pages.Ventanas
             return RedirectToPage();
         }
 
-        private void Cargar()
+      
+        public string Servicio(int idServicio)
         {
-            try
-            {
-                Lista = _negocio.Consultar(RolActual) ?? new();
-                Clientes = new ClientesPresentacion().Consultar(RolActual) ?? new();
-                Barberos = new BarberosPresentacion().Consultar(RolActual) ?? new();
-                Servicios = new ServiciosPresentacion().Consultar(RolActual) ?? new();
-                Personas = new PersonasPresentacion().Consultar(RolActual) ?? new();
-                Empleados = new EmpleadosPresentacion().Consultar(RolActual) ?? new();
-                if (EsAdministrador)
-                    Auditoria = (_negocio.ConsultarAuditoria(RolActual) ?? new())
-                        .Select(a => new FilaAuditoria
-                        {
-                            IdAuditoria = a.IdAuditoria, IdReferencia = a.IdCita,
-                            Accion = a.Accion ?? "", Fecha = a.Fecha
-                        }).ToList();
-            }
-            catch (Exception ex) { ErrorMsg = "No se pudo conectar con el API: " + ex.Message; }
+            var s = Servicios.FirstOrDefault(x => x.IdServicio == idServicio);
+            if (s == null) return $"#{idServicio}";
+
+        
+            var corte = ServiciosCorte.FirstOrDefault(c => c.IdServicio == idServicio);
+            if (corte != null) return $" {s.Nombre} ({corte.TipoCorte}) — ${s.PrecioBase:N0}";
+
+           
+            var trat = ServiciosTrat.FirstOrDefault(t => t.IdServicio == idServicio);
+            if (trat != null) return $" {s.Nombre} ({trat.TipoTratamiento}) — ${s.PrecioBase:N0}";
+
+         
+            var combo = Combos.FirstOrDefault(cb => cb.IdServicio == idServicio);
+            if (combo != null) return $" {s.Nombre} ({combo.DescuentoCombo}% dto) — ${s.PrecioBase:N0}";
+
+            return $"{s.Nombre} — ${s.PrecioBase:N0}";
         }
 
         public string Cliente(int idCliente)
@@ -91,13 +95,37 @@ namespace Asp_Presentaciones.Pages.Ventanas
             return e == null ? $"Barbero #{idBarbero}" : $"{e.Cargo} (#{idBarbero})";
         }
 
-        public string Servicio(int idServicio) => Servicios.FirstOrDefault(x => x.IdServicio == idServicio)?.Nombre ?? $"#{idServicio}";
-
         public string EstadoClase(string? estado) => estado switch
         {
             "Completada" or "Confirmada" => "activo",
             "Cancelada" => "inactivo",
             _ => "ins"
         };
+
+        private void Cargar()
+        {
+            try
+            {
+                Lista = _negocio.Consultar(RolActual) ?? new();
+                Clientes = new ClientesPresentacion().Consultar(RolActual) ?? new();
+                Barberos = new BarberosPresentacion().Consultar(RolActual) ?? new();
+                Servicios = new ServiciosPresentacion().Consultar(RolActual) ?? new();
+                ServiciosCorte = new ServiciosCortePresentacion().Consultar(RolActual) ?? new();
+                ServiciosTrat = new ServiciosTratamientoPresentacion().Consultar(RolActual) ?? new();
+                Combos = new CombosPresentacion().Consultar(RolActual) ?? new();
+                Personas = new PersonasPresentacion().Consultar(RolActual) ?? new();
+                Empleados = new EmpleadosPresentacion().Consultar(RolActual) ?? new();
+                if (EsAdministrador)
+                    Auditoria = (_negocio.ConsultarAuditoria(RolActual) ?? new())
+                        .Select(a => new FilaAuditoria
+                        {
+                            IdAuditoria = a.IdAuditoria,
+                            IdReferencia = a.IdCita,
+                            Accion = a.Accion ?? "",
+                            Fecha = a.Fecha
+                        }).ToList();
+            }
+            catch (Exception ex) { ErrorMsg = "No se pudo conectar con el API: " + ex.Message; }
+        }
     }
 }

@@ -22,14 +22,14 @@ namespace Asp_Presentaciones.Pages.Ventanas
         [TempData] public string? Mensaje { get; set; }
         [TempData] public string? ErrorMsg { get; set; }
 
-        // Resultado calculo
+      
         public decimal? PrecioFinalCalculado { get; private set; }
         public decimal? AhorroCalculado { get; private set; }
         public string InfoCombo { get; private set; } = "";
 
         public IActionResult OnGet()
         {
-            var redir = ValidarAcceso("Administrador", "Recepcionista");
+            var redir = ValidarAcceso("Administrador", "Recepcionista","Cliente","Barbero");
             if (redir != null) return redir;
             Cargar();
             return Page();
@@ -49,28 +49,27 @@ namespace Asp_Presentaciones.Pages.Ventanas
 
                 Cargar();
 
-                // Obtener precio base del corte
+         
                 var corte = ListaCortes.FirstOrDefault(c => c.IdServicioCorte == IdServicioCorte);
                 if (corte == null) throw new Exception("Corte no encontrado.");
                 var servCorte = ListaServicios.FirstOrDefault(s => s.IdServicio == corte.IdServicio);
                 if (servCorte == null) throw new Exception("Servicio de corte no encontrado.");
 
-                // Obtener precio base del tratamiento
+                
                 var trat = ListaTratamientos.FirstOrDefault(t => t.IdServicioTratamiento == IdServicioTrat);
                 if (trat == null) throw new Exception("Tratamiento no encontrado.");
                 var servTrat = ListaServicios.FirstOrDefault(s => s.IdServicio == trat.IdServicio);
                 if (servTrat == null) throw new Exception("Servicio de tratamiento no encontrado.");
 
-                // Precio base = suma de los dos servicios
+                
                 decimal precioTotal = servCorte.PrecioBase + servTrat.PrecioBase;
 
-                // Asignar al combo — usamos IdServicio del corte como referencia principal
                 Item.IdServicio = corte.IdServicio;
                 Item.Descripcion = string.IsNullOrEmpty(Item.Descripcion)
                     ? $"{servCorte.Nombre} + {servTrat.Nombre}"
                     : Item.Descripcion;
 
-                // Guardar combo
+            
                 Combos comboGuardado;
                 if (Item.IdCombo == 0)
                     comboGuardado = await _negocio.Guardar(Item, RolActual);
@@ -79,7 +78,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
                     comboGuardado = _negocio.Modificar(Item, RolActual);
                 }
 
-                // Guardar relacion ComboServicios para el corte
+             
                 var csCorte = new CombosPresentacion();
                 var comboServCorte = new ComboServicios
                 {
@@ -113,7 +112,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
             return RedirectToPage();
         }
 
-        // Calcula precio final con descuento
+      
         public IActionResult OnPostCalcularPrecio()
         {
             var redir = ValidarAcceso("Administrador", "Recepcionista", "Barbero", "Cliente");
@@ -122,7 +121,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
             {
                 Cargar();
 
-                // Obtener servicios del combo desde ComboServicios
+              
                 var serviciosDelCombo = ListaComboServicios
                     .Where(cs => cs.IdCombo == Item.IdCombo)
                     .Select(cs => ListaServicios.FirstOrDefault(s => s.IdServicio == cs.IdServicio))
@@ -131,7 +130,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
 
                 if (!serviciosDelCombo.Any())
                 {
-                    // Si no hay registros en ComboServicios usar IdServicio del combo
+               
                     var servBase = ListaServicios.FirstOrDefault(s => s.IdServicio == Item.IdServicio);
                     if (servBase != null) serviciosDelCombo.Add(servBase);
                 }
@@ -145,7 +144,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
             return Page();
         }
 
-        // Nombre para mostrar en tabla
+
         public string NombreServicio(int idServicio)
         {
             var s = ListaServicios.FirstOrDefault(x => x.IdServicio == idServicio);

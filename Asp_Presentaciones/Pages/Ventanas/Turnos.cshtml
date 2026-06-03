@@ -5,7 +5,7 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Turnos</h1>
-        <p class="text-tenue mb-0">Turnos de trabajo de los barberos</p>
+        <p class="text-tenue mb-0">Turnos de trabajo de los barberos(Todavia sin logica precisa)</p>
     </div>
     <button class="btn btn-oro" onclick="bbAbrirModal('modalTurnos', null)">+ Agregar</button>
 </div>
@@ -23,13 +23,13 @@
         <div class="bb-card"><div class="bb-card-body p-0">
             <table class="bb-table">
                 <thead><tr><th>#</th>
-<th>Barbero</th>
-<th>Sede</th>
-<th>Fecha</th>
-<th>Inicio</th>
-<th>Fin</th>
-<th>Estado</th>
-<th class='acciones'>Acciones</th></tr></thead>
+                        <th>Barbero</th>
+                        <th>Sede</th>
+                        <th>Fecha</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Estado</th>
+                        <th class='acciones'>Acciones</th></tr></thead>
                 <tbody>
                     @if (Model.Lista.Count == 0) { <tr><td colspan="8" class="text-tenue text-center py-4">Sin registros.</td></tr> }
                     @foreach (var p in Model.Lista)
@@ -37,12 +37,12 @@
                         var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdTurno, p.IdBarbero, p.IdSede, p.FechaTurno, p.HoraInicio, p.HoraFin, p.Estado });
                         <tr>
                             <td>@p.IdTurno</td>
-<td>@p.IdBarbero</td>
-<td>@p.IdSede</td>
-<td>@p.FechaTurno</td>
-<td>@p.HoraInicio</td>
-<td>@p.HoraFin</td>
-<td>@p.Estado</td>
+                            <td>@p.IdBarbero</td>
+                            <td>@p.IdSede</td>
+                            <td>@p.FechaTurno</td>
+                            <td>@p.HoraInicio</td>
+                            <td>@p.HoraFin</td>
+                            <td>@p.Estado</td>
                             <td class="acciones">
                                 <button class="btn btn-sm btn-fantasma" data-json="@json"
                                     onclick="bbAbrirModal('modalTurnos', JSON.parse(this.dataset.json))">Editar</button>

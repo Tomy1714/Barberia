@@ -19,7 +19,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
 
         public IActionResult OnGet()
         {
-            var redir = ValidarAcceso("Administrador", "Recepcionista");
+            var redir = ValidarAcceso("Administrador", "Recepcionista", "Cliente", "Barbero");
             if (redir != null) return redir;
             Cargar();
             return Page();
@@ -31,11 +31,11 @@ namespace Asp_Presentaciones.Pages.Ventanas
             if (redir != null) return redir;
             try
             {
-                // Validar nivel de complejidad 1-5
+               
                 if (Item.NivelComplejidad < 1 || Item.NivelComplejidad > 5)
                     throw new Exception("El nivel de complejidad debe estar entre 1 y 5.");
 
-                // Calcular recargo automaticamente: Nivel x $5.000
+              
                 Item.RecargoComplejidad = Item.NivelComplejidad * 5000;
 
                 if (Item.IdServicioCorte == 0) await _negocio.Guardar(Item, RolActual);
@@ -60,7 +60,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
             return RedirectToPage();
         }
 
-        // Nombre del servicio para mostrar en la tabla
+       
         public string NombreServicio(int idServicio)
         {
             var s = Servicios.FirstOrDefault(x => x.IdServicio == idServicio);

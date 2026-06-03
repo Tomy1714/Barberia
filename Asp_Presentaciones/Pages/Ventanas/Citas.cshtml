@@ -1,65 +1,117 @@
 @page
 @model Asp_Presentaciones.Pages.Ventanas.CitasModel
-@{ ViewData["Title"] = "Citas"; bool admin = Model.EsAdministrador; bool puedeAgendar = admin || Model.EsRecepcionista || Model.EsCliente; }
+@{
+    ViewData["Title"] = "Citas";
+    bool admin = Model.EsAdministrador;
+    bool puedeAgendar = admin || Model.EsRecepcionista || Model.EsCliente;
+}
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Citas</h1>
         <p class="text-tenue mb-0">Agenda de servicios</p>
     </div>
-    @if (puedeAgendar) { <button class="btn btn-oro" onclick="bbAbrirModal('modalCita', null)">+ Agendar cita</button> }
+    @if (puedeAgendar)
+    {
+        <button class="btn btn-oro" onclick="bbAbrirModal('modalCita', null)">+ Agendar cita</button>
+    }
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
-@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success py-2">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
+}
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
-    @if (admin) { <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li> }
+    @if (admin)
+    {
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    }
 </ul>
 
 <div class="tab-content">
     <div class="tab-pane fade show active" id="tabReg">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <table class="bb-table">
-                <thead><tr><th>#</th><th>Cliente</th><th>Barbero</th><th>Servicio</th><th>Fecha y hora</th><th>Estado</th>@if (puedeAgendar) { <th class="acciones">Acciones</th> }</tr></thead>
-                <tbody>
-                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin citas registradas.</td></tr> }
-                    @foreach (var c in Model.Lista)
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { c.IdCita, c.IdCliente, c.IdBarbero, c.IdServicio, FechaHoraInicio = c.FechaHoraInicio?.ToString("yyyy-MM-ddTHH:mm"), c.Estado, c.Observaciones });
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <table class="bb-table">
+                    <thead>
                         <tr>
-                            <td>@c.IdCita</td>
-                            <td>@Model.Cliente(c.IdCliente)</td>
-                            <td>@Model.Barbero(c.IdBarbero)</td>
-                            <td>@Model.Servicio(c.IdServicio)</td>
-                            <td>@(c.FechaHoraInicio?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
-                            <td><span class="estado @Model.EstadoClase(c.Estado)">@(c.Estado ?? "Pendiente")</span></td>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Barbero</th>
+                            <th>Servicio</th>
+                            <th>Fecha y hora</th>
+                            <th>Estado</th>
                             @if (puedeAgendar)
                             {
-                                <td class="acciones">
-                                    <button class="btn btn-sm btn-fantasma" data-json="@json" onclick="bbAbrirModal('modalCita', JSON.parse(this.dataset.json))">Editar</button>
-                                    @if (admin || Model.EsRecepcionista)
-                                    {
-                                        <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                            <input type="hidden" name="Item.IdCita" value="@c.IdCita" />
-                                            <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                        </form>
-                                    }
-                                </td>
+                                <th class="acciones">Acciones</th>
                             }
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+                    </thead>
+                    <tbody>
+                        @if (Model.Lista.Count == 0)
+                        {
+                            <tr><td colspan="7" class="text-tenue text-center py-4">Sin citas registradas.</td></tr>
+                        }
+                        @foreach (var c in Model.Lista)
+                        {
+                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                            {
+                                c.IdCita,
+                                c.IdCliente,
+                                c.IdBarbero,
+                                c.IdServicio,
+                                FechaHoraInicio = c.FechaHoraInicio?.ToString("yyyy-MM-ddTHH:mm"),
+                                c.Estado,
+                                c.Observaciones
+                            });
+                            <tr>
+                                <td>@c.IdCita</td>
+                                <td>@Model.Cliente(c.IdCliente)</td>
+                                <td>@Model.Barbero(c.IdBarbero)</td>
+                                <td>@Model.Servicio(c.IdServicio)</td>
+                                <td>@(c.FechaHoraInicio?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                                <td><span class="estado @Model.EstadoClase(c.Estado)">@(c.Estado ?? "Pendiente")</span></td>
+                                @if (puedeAgendar)
+                                {
+                                    <td class="acciones">
+                                        <button class="btn btn-sm btn-fantasma" data-json="@json"
+                                                onclick="bbAbrirModal('modalCita', JSON.parse(this.dataset.json))">
+                                            Editar
+                                        </button>
+                                        @if (admin || Model.EsRecepcionista)
+                                        {
+                                            <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                                  onsubmit="return bbConfirmarBorrado(event)">
+                                                <input type="hidden" name="Item.IdCita" value="@c.IdCita" />
+                                                <button type="submit" class="btn btn-sm btn-fantasma"
+                                                        style="color:var(--bb-rojo)">
+                                                    Borrar
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     @if (admin)
     {
         <div class="tab-pane fade" id="tabAud">
-            <div class="bb-card"><div class="bb-card-body p-0">
-                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Cita"))" />
-            </div></div>
+            <div class="bb-card">
+                <div class="bb-card-body p-0">
+                    <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Cita"))" />
+                </div>
+            </div>
         </div>
     }
 </div>
@@ -75,16 +127,20 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" asp-for="Item.IdCita" />
+
                     <div class="mb-3">
                         <label class="form-label">Cliente</label>
                         <select asp-for="Item.IdCliente" class="form-select" required>
                             <option value="">— Seleccione —</option>
                             @foreach (var cl in Model.Clientes)
                             {
-                                <option value="@cl.IdCliente">@Model.Cliente(cl.IdCliente) (#@cl.IdCliente)</option>
+                                <option value="@cl.IdCliente">
+                                    @Model.Cliente(cl.IdCliente) (#@cl.IdCliente)
+                                </option>
                             }
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Barbero</label>
                         <select asp-for="Item.IdBarbero" class="form-select" required>
@@ -95,17 +151,100 @@
                             }
                         </select>
                     </div>
+
+                
                     <div class="mb-3">
                         <label class="form-label">Servicio</label>
                         <select asp-for="Item.IdServicio" class="form-select" required>
-                            <option value="">— Seleccione —</option>
-                            @foreach (var s in Model.Servicios)
+                            <option value="">— Seleccione un servicio —</option>
+
+                           
+                            @if (Model.ServiciosCorte.Any())
                             {
-                                <option value="@s.IdServicio">@s.Nombre — @s.PrecioBase.ToString("C0")</option>
+                                <optgroup label="Cortes">
+                                    @foreach (var c in Model.ServiciosCorte)
+                                    {
+                                        var svc = Model.Servicios.FirstOrDefault(s => s.IdServicio == c.IdServicio);
+                                        if (svc != null)
+                                        {
+                                            <option value="@svc.IdServicio">
+                                                @svc.Nombre — @c.TipoCorte
+                                                @(c.IncluyeBarba ? "+ barba" : "")
+                                                — $@svc.PrecioBase.ToString("N0")
+                                                (@svc.DuracionMinutos min)
+                                            </option>
+                                        }
+                                    }
+                                </optgroup>
+                            }
+
+                           
+                            @if (Model.ServiciosTrat.Any())
+                            {
+                                <optgroup label="Tratamientos">
+                                    @foreach (var t in Model.ServiciosTrat)
+                                    {
+                                        var svc = Model.Servicios.FirstOrDefault(s => s.IdServicio == t.IdServicio);
+                                        if (svc != null)
+                                        {
+                                            <option value="@svc.IdServicio">
+                                                @svc.Nombre — @t.TipoTratamiento
+                                                (@t.SesionesRequeridas sesión/es)
+                                                — $@svc.PrecioBase.ToString("N0")
+                                            </option>
+                                        }
+                                    }
+                                </optgroup>
+                            }
+
+                        
+                            @if (Model.Combos.Any())
+                            {
+                                <optgroup label="Combos">
+                                    @foreach (var cb in Model.Combos)
+                                    {
+                                        var svc = Model.Servicios.FirstOrDefault(s => s.IdServicio == cb.IdServicio);
+                                        if (svc != null)
+                                        {
+                                            <option value="@svc.IdServicio">
+                                                @svc.Nombre — @cb.DescuentoCombo% descuento
+                                                — $@svc.PrecioBase.ToString("N0")
+                                            </option>
+                                        }
+                                    }
+                                </optgroup>
+                            }
+
+                           
+                            @{
+                                var idsClasificados = Model.ServiciosCorte.Select(c => c.IdServicio)
+                                    .Union(Model.ServiciosTrat.Select(t => t.IdServicio))
+                                    .Union(Model.Combos.Select(cb => cb.IdServicio))
+                                    .ToHashSet();
+                                var sinClasificar = Model.Servicios
+                                    .Where(s => !idsClasificados.Contains(s.IdServicio)).ToList();
+                            }
+                            @if (sinClasificar.Any())
+                            {
+                                <optgroup label="Otros servicios">
+                                    @foreach (var s in sinClasificar)
+                                    {
+                                        <option value="@s.IdServicio">
+                                            @s.Nombre — $@s.PrecioBase.ToString("N0")
+                                            (@s.DuracionMinutos min)
+                                        </option>
+                                    }
+                                </optgroup>
                             }
                         </select>
                     </div>
-                    <div class="mb-3"><label class="form-label">Fecha y hora</label><input asp-for="Item.FechaHoraInicio" type="datetime-local" class="form-control" required /></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fecha y hora</label>
+                        <input asp-for="Item.FechaHoraInicio" type="datetime-local"
+                               class="form-control" required />
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Estado</label>
                         <select asp-for="Item.Estado" class="form-select">
@@ -115,7 +254,11 @@
                             }
                         </select>
                     </div>
-                    <div class="mb-3"><label class="form-label">Observaciones</label><textarea asp-for="Item.Observaciones" class="form-control" rows="2"></textarea></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea asp-for="Item.Observaciones" class="form-control" rows="2"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>

@@ -17,13 +17,13 @@ namespace Asp_Presentaciones.Pages.Ventanas
         [TempData] public string? Mensaje { get; set; }
         [TempData] public string? ErrorMsg { get; set; }
 
-        // Resultado del calculo de precio final
+      
         public decimal? PrecioFinalCalculado { get; private set; }
         public string NombreTratamiento { get; private set; } = "";
 
         public IActionResult OnGet()
         {
-            var redir = ValidarAcceso("Administrador", "Recepcionista");
+            var redir = ValidarAcceso("Administrador", "Recepcionista", "Cliente", "Barbero");
             if (redir != null) return redir;
             Cargar();
             return Page();
@@ -35,11 +35,11 @@ namespace Asp_Presentaciones.Pages.Ventanas
             if (redir != null) return redir;
             try
             {
-                // Validar sesiones minimo 1
+            
                 if (Item.SesionesRequeridas < 1)
                     throw new Exception("El número de sesiones debe ser al menos 1.");
 
-                // Validar que el costo no sea negativo
+              
                 if (Item.CostoProducto < 0)
                     throw new Exception("El costo del producto no puede ser negativo.");
 
@@ -65,7 +65,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
             return RedirectToPage();
         }
 
-        // Calcula precio final: PrecioBase + (CostoProducto x Sesiones)
+      
         public IActionResult OnPostCalcularPrecio()
         {
             var redir = ValidarAcceso("Administrador", "Recepcionista");
@@ -84,7 +84,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
             return Page();
         }
 
-        // Nombre del servicio para mostrar en tabla
+      
         public string NombreServicio(int idServicio)
         {
             var s = Servicios.FirstOrDefault(x => x.IdServicio == idServicio);

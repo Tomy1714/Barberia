@@ -18,7 +18,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
 
         public IActionResult OnGet()
         {
-            var redir = ValidarAcceso("Administrador");
+            var redir = ValidarAcceso("Administrador","Recepcionista", "Cliente", "Barbero");
             if (redir != null) return redir;
             Cargar();
             return Page();

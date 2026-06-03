@@ -41,7 +41,7 @@ namespace Asp_Presentaciones.Pages
             }
             catch
             {
-                Aviso = "No se pudo conectar con el API (¿está corriendo en https://localhost:7179?). El panel se muestra sin datos.";
+                Aviso = "No se pudo conectar con el API, ¿está corriendo en https://localhost:7179?) El panel se muestra sin datos.";
             }
 
             return Page();

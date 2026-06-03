@@ -3,8 +3,7 @@ using LibPresentaciones.Implementaciones;
 using Lib_Negocio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
+
 
 namespace Asp_Presentaciones.Pages.Ventanas
 {
@@ -21,7 +20,7 @@ namespace Asp_Presentaciones.Pages.Ventanas
 
         public IActionResult OnGet()
         {
-            var redir = ValidarAcceso();   // cualquier usuario autenticado puede consultar
+            var redir = ValidarAcceso();   
             if (redir != null) return redir;
             Cargar();
             return Page();

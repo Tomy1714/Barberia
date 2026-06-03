@@ -1,15 +1,16 @@
 ﻿@page
 @model Asp_Presentaciones.Pages.Ventanas.FacturasModel
 @{
-    ViewData["Title"] = "Facturas";
+    ViewData["Title"] = "Facturas"; bool admin = Model.EsAdministrador;
 }
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Facturas</h1>
-        <p class="text-tenue mb-0">Documentos contables generados por pagos</p>
+        <p class="text-tenue mb-0">Se generan automáticamente al registrar un pago</p>
     </div>
-    <button class="btn btn-oro" onclick="bbAbrirModal('modalFacturas', null)">+ Agregar</button>
+   
+    <a asp-page="/Ventanas/Pagos" class="btn btn-oro"> Ir a los pagos</a>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Mensaje))
@@ -18,12 +19,15 @@
 }
 @if (!string.IsNullOrEmpty(Model.ErrorMsg))
 {
-    <div class="alert alert-danger py-2">@Model.ErrorMsg</div>
+    <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
 }
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    @if (admin)
+    {
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    }
 </ul>
 
 <div class="tab-content">
@@ -34,41 +38,49 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Código</th>
                             <th>Pago</th>
                             <th>Cliente</th>
-                            <th>Código</th>
+                            <th>Fecha</th>
                             <th>Subtotal</th>
-                            <th>IVA</th>
+                            <th>IVA (19%)</th>
                             <th>Total</th>
-                            <th class='acciones'>Acciones</th>
+                            @if (admin)
+                            {
+                                <th class="acciones">Acciones</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
                         @if (Model.Lista.Count == 0)
                         {
-                            <tr><td colspan="8" class="text-tenue text-center py-4">Sin registros.</td></tr>
-                        }
-                        @foreach (var p in Model.Lista)
-                        {
-                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdFactura, p.IdPago, p.IdCliente, p.CodigoFactura, p.Subtotal, p.Impuestos, p.Total });
                             <tr>
-                                <td>@p.IdFactura</td>
-                                <td>@p.IdPago</td>
-                                <td>@p.IdCliente</td>
-                                <td>@p.CodigoFactura</td>
-                                <td>@p.Subtotal</td>
-                                <td>@p.Impuestos</td>
-                                <td>@p.Total</td>
-                                <td class="acciones">
-                                    <button class="btn btn-sm btn-fantasma" data-json="@json"
-                                            onclick="bbAbrirModal('modalFacturas', JSON.parse(this.dataset.json))">
-                                        Editar
-                                    </button>
-                                    <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                        <input type="hidden" name="Item.IdFactura" value="@p.IdFactura" />
-                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                    </form>
+                                <td colspan="9" class="text-tenue text-center py-4">
+                                    Sin facturas. La factura aparecera cuando hagas un pago.
                                 </td>
+                            </tr>
+                        }
+                        @foreach (var f in Model.Lista)
+                        {
+                            <tr>
+                                <td>@f.IdFactura</td>
+                                <td><strong>@f.CodigoFactura</strong></td>
+                                <td><small>@Model.NombrePago(f.IdPago)</small></td>
+                                <td>@Model.NombreCliente(f.IdCliente)</td>
+                                <td><small>@f.FechaEmision.ToString("dd/MM/yyyy HH:mm")</small></td>
+                                <td>$@f.Subtotal.ToString("N0")</td>
+                                <td>$@f.Impuestos.ToString("N0")</td>
+                                <td><strong style="color:var(--bb-oro-claro)">$@f.Total.ToString("N0")</strong></td>
+                                @if (admin)
+                                {
+                                    <td class="acciones">
+                                        <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                              onsubmit="return bbConfirmarBorrado(event)">
+                                            <input type="hidden" name="Item.IdFactura" value="@f.IdFactura" />
+                                            <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                        </form>
+                                    </td>
+                                }
                             </tr>
                         }
                     </tbody>
@@ -76,53 +88,14 @@
             </div>
         </div>
     </div>
-    <div class="tab-pane fade" id="tabAud">
-        <div class="bb-card">
-            <div class="bb-card-body p-0">
-                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Facturas"))" />
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card">
+                <div class="bb-card-body p-0">
+                    <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Factura"))" />
+                </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalFacturas" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="post" asp-page-handler="Guardar" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> facturas</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" asp-for="Item.IdFactura" />
-                <div class="mb-3">
-                    <label class="form-label">IdPago</label>
-                    <input asp-for="Item.IdPago" type="number" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">IdCliente</label>
-                    <input asp-for="Item.IdCliente" type="number" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">CodigoFactura</label>
-                    <input asp-for="Item.CodigoFactura" type="text" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Subtotal</label>
-                    <input asp-for="Item.Subtotal" type="number" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Impuestos</label>
-                    <input asp-for="Item.Impuestos" type="number" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Total</label>
-                    <input asp-for="Item.Total" type="number" class="form-control" />
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-oro">Guardar</button>
-            </div>
-        </form>
-    </div>
+    }
 </div>

@@ -2,10 +2,10 @@ using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddRazorPages();
 
-// Sesion para guardar el usuario autenticado y su rol.
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(opciones =>
@@ -18,7 +18,7 @@ builder.Services.AddSession(opciones =>
 QuestPDF.Settings.License = LicenseType.Community;
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
