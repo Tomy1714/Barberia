@@ -1,95 +1,203 @@
 @page
 @model Asp_Presentaciones.Pages.Ventanas.CalificacionesModel
-@{ ViewData["Title"] = "Calificaciones"; }
+@{
+    ViewData["Title"] = "Calificaciones"; bool admin = Model.EsAdministrador; bool cliente = Model.EsCliente;
+}
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Calificaciones</h1>
         <p class="text-tenue mb-0">Evaluaciones de clientes a barberos</p>
     </div>
-    <button class="btn btn-oro" onclick="bbAbrirModal('modalCalificaciones', null)">+ Agregar</button>
+    @if (admin || cliente)
+    {
+        <button class="btn btn-oro" onclick="bbAbrirModal('modalCalificaciones', null)"> Calificar servicio</button>
+    }
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
-@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success py-2">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
+}
+
+
+@if (Model.PromediosBarbero.Any())
+{
+    <div class="bb-card mb-3">
+        <div class="bb-card-head"><h2> Promedio por barbero</h2></div>
+        <div class="bb-card-body">
+            <div class="row g-2">
+                @foreach (var kv in Model.PromediosBarbero)
+                {
+                    <div class="col-auto">
+                        <div class="bb-kpi" style="min-width:140px">
+                            <div class="v" style="font-size:1.4rem">@kv.Value.ToString("N1")</div>
+                            <div class="t">@Model.NombreBarbero(kv.Key)</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    @if (admin)
+    {
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    }
 </ul>
 
 <div class="tab-content">
     <div class="tab-pane fade show active" id="tabReg">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <table class="bb-table">
-                <thead><tr><th>#</th>
-<th>Cita</th>
-<th>Barbero</th>
-<th>Puntaje</th>
-<th>Comentario</th>
-<th class='acciones'>Acciones</th></tr></thead>
-                <tbody>
-                    @if (Model.Lista.Count == 0) { <tr><td colspan="6" class="text-tenue text-center py-4">Sin registros.</td></tr> }
-                    @foreach (var p in Model.Lista)
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdCalificacion, p.IdCita, p.IdBarbero, p.Puntaje, p.Comentario });
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <table class="bb-table">
+                    <thead>
                         <tr>
-                            <td>@p.IdCalificacion</td>
-<td>@p.IdCita</td>
-<td>@p.IdBarbero</td>
-<td>@p.Puntaje</td>
-<td>@p.Comentario</td>
-                            <td class="acciones">
-                                <button class="btn btn-sm btn-fantasma" data-json="@json"
-                                    onclick="bbAbrirModal('modalCalificaciones', JSON.parse(this.dataset.json))">Editar</button>
-                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                    <input type="hidden" name="Item.IdCalificacion" value="@p.IdCalificacion" />
-                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                </form>
-                            </td>
+                            <th>#</th>
+                            <th>Cita</th>
+                            <th>Barbero</th>
+                            <th>Puntaje</th>
+                            <th>Comentario</th>
+                            <th>Fecha</th>
+                            @if (admin)
+                            {
+                                <th class="acciones">Acciones</th>
+                            }
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+                    </thead>
+                    <tbody>
+                        @if (Model.Lista.Count == 0)
+                        {
+                            <tr><td colspan="7" class="text-tenue text-center py-4">Sin calificaciones.</td></tr>
+                        }
+                        @foreach (var c in Model.Lista)
+                        {
+                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                            {
+                                c.IdCalificacion,
+                                c.IdCita,
+                                c.IdBarbero,
+                                c.Puntaje,
+                                c.Comentario
+                            });
+                            <tr>
+                                <td>@c.IdCalificacion</td>
+                                <td><small>@Model.NombreCita(c.IdCita)</small></td>
+                                <td>@Model.NombreBarbero(c.IdBarbero)</td>
+                                <td>
+                                    <span style="color:var(--bb-oro-claro);font-size:1.1rem">
+                                        @Model.Estrellas(c.Puntaje)
+                                    </span>
+                                    <small class="text-tenue">(@c.Puntaje/5)</small>
+                                </td>
+                                <td class="text-tenue">@c.Comentario</td>
+                                <td><small>@c.FechaCalificacion.ToString("dd/MM/yyyy")</small></td>
+                                @if (admin)
+                                {
+                                    <td class="acciones">
+                                        <button class="btn btn-sm btn-fantasma" data-json="@json"
+                                                onclick="bbAbrirModal('modalCalificaciones', JSON.parse(this.dataset.json))">
+                                            Editar
+                                        </button>
+                                        <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                              onsubmit="return bbConfirmarBorrado(event)">
+                                            <input type="hidden" name="Item.IdCalificacion" value="@c.IdCalificacion" />
+                                            <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                        </form>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="tab-pane fade" id="tabAud">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Calificaciones"))" />
-        </div></div>
-    </div>
+    @if (admin)
+    {
+        <div class="tab-pane fade" id="tabAud">
+            <div class="bb-card">
+                <div class="bb-card-body p-0">
+                    <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Calificacion"))" />
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
-<div class="modal fade" id="modalCalificaciones" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="post" asp-page-handler="Guardar" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> calificaciones</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" asp-for="Item.IdCalificacion" />
-                <div class="mb-3">
-                    <label class="form-label">IdCita</label>
-                    <input asp-for="Item.IdCita" type="number" class="form-control" />
+@if (admin || cliente)
+{
+    <div class="modal fade" id="modalCalificaciones" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" asp-page-handler="Guardar" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"> Calificar servicio</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">IdBarbero</label>
-                    <input asp-for="Item.IdBarbero" type="number" class="form-control" />
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Item.IdCalificacion" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Cita a calificar</label>
+                        <select asp-for="Item.IdCita" class="form-select" required>
+                            <option value="">— Seleccione una cita —</option>
+                            @foreach (var c in Model.Citas.Where(c => c.Estado == "Completada" || c.Estado == "Confirmada"))
+                            {
+                                <option value="@c.IdCita">
+                                    Cita #@c.IdCita — @(c.FechaHoraInicio?.ToString("dd/MM/yyyy HH:mm") ?? "-") — @c.Estado
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Barbero</label>
+                        <select asp-for="Item.IdBarbero" class="form-select" required>
+                            <option value="">— Seleccione el barbero —</option>
+                            @foreach (var b in Model.Barberos)
+                            {
+                                <option value="@b.IdBarbero">@Model.NombreBarbero(b.IdBarbero)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Puntaje
+                            <small class="text-tenue">(1 = malo · 5 = excelente)</small>
+                        </label>
+                        <div class="d-flex gap-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio"
+                                           name="Item.Puntaje" value="@i" id="star@i"
+                                    @(i == 5 ? "checked" : "") />
+                                    <label class="form-check-label" for="star@i"
+                                           style="color:var(--bb-oro-claro);font-size:1.3rem"> @i</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Comentario <small class="text-tenue">(opcional)</small></label>
+                        <textarea asp-for="Item.Comentario" class="form-control" rows="3"
+                                  placeholder="Cuéntanos tu experiencia..."></textarea>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Puntaje</label>
-                    <input asp-for="Item.Puntaje" type="number" class="form-control" />
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-oro">Enviar calificación</button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Comentario</label>
-                    <input asp-for="Item.Comentario" type="text" class="form-control" />
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-oro">Guardar</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
+}
