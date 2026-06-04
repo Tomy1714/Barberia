@@ -1,95 +1,195 @@
 @page
 @model Asp_Presentaciones.Pages.Ventanas.HorariosModel
-@{ ViewData["Title"] = "Horarios"; }
+@{
+    ViewData["Title"] = "Horarios";
+}
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Horarios</h1>
-        <p class="text-tenue mb-0">Horarios semanales de los empleados</p>
+        <p class="text-tenue mb-0">Gestión de horarios de empleados</p>
     </div>
-    <button class="btn btn-oro" onclick="bbAbrirModal('modalHorarios', null)">+ Agregar</button>
+
+    <button class="btn btn-oro" onclick="bbAbrirModal('modalHorarios', null)">
+        + Agregar
+    </button>
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
-@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success py-2">@Model.Mensaje</div>
+}
+
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger py-2">@Model.ErrorMsg</div>
+}
 
 <ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a></li>
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabAud">Auditoría</a>
+    </li>
 </ul>
 
 <div class="tab-content">
+
+
     <div class="tab-pane fade show active" id="tabReg">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <table class="bb-table">
-                <thead><tr><th>#</th>
-<th>Empleado</th>
-<th>Entrada</th>
-<th>Salida</th>
-<th>Activo</th>
-<th class='acciones'>Acciones</th></tr></thead>
-                <tbody>
-                    @if (Model.Lista.Count == 0) { <tr><td colspan="6" class="text-tenue text-center py-4">Sin registros.</td></tr> }
-                    @foreach (var p in Model.Lista)
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdHorario, p.IdEmpleado, p.HoraEntrada, p.HoraSalida, p.Activo });
+
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+
+                <table class="bb-table">
+                    <thead>
                         <tr>
-                            <td>@p.IdHorario</td>
-<td>@p.IdEmpleado</td>
-<td>@p.HoraEntrada</td>
-<td>@p.HoraSalida</td>
-<td>@p.Activo</td>
-                            <td class="acciones">
-                                <button class="btn btn-sm btn-fantasma" data-json="@json"
-                                    onclick="bbAbrirModal('modalHorarios', JSON.parse(this.dataset.json))">Editar</button>
-                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                    <input type="hidden" name="Item.IdHorario" value="@p.IdHorario" />
-                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                </form>
-                            </td>
+                            <th>#</th>
+                            <th>Empleado</th>
+                            <th>Hora Entrada</th>
+                            <th>Hora Salida</th>
+                            <th>Activo</th>
+                            <th class="acciones">Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.Lista.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-tenue py-4">
+                                    Sin registros
+                                </td>
+                            </tr>
+                        }
+
+                        @foreach (var h in Model.Lista)
+                        {
+                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                            {
+                                h.IdHorario,
+                                h.IdEmpleado,
+                                h.HoraEntrada,
+                                h.HoraSalida,
+                                h.Activo
+                            });
+
+                            <tr>
+                                <td>@h.IdHorario</td>
+
+                                <td>
+                                    @Model.NombreEmpleado(h.IdEmpleado)
+                                </td>
+
+                                <td>@h.HoraEntrada</td>
+                                <td>@h.HoraSalida</td>
+                                <td>@h.Activo</td>
+
+                                <td class="acciones">
+
+                                    <button class="btn btn-sm btn-fantasma"
+                                            data-json="@json"
+                                            onclick="bbAbrirModal('modalHorarios', JSON.parse(this.dataset.json))">
+                                        Editar
+                                    </button>
+
+                                    <form method="post"
+                                          asp-page-handler="Eliminar"
+                                          class="d-inline"
+                                          onsubmit="return bbConfirmarBorrado(event)">
+                                        <input type="hidden" name="Item.IdHorario" value="@h.IdHorario" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-fantasma"
+                                                style="color:var(--bb-rojo)">
+                                            Borrar
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
     </div>
+
+
     <div class="tab-pane fade" id="tabAud">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Horarios"))" />
-        </div></div>
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Horarios"))" />
+            </div>
+        </div>
     </div>
+
 </div>
+
 
 <div class="modal fade" id="modalHorarios" tabindex="-1">
     <div class="modal-dialog">
+
         <form method="post" asp-page-handler="Guardar" class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> horarios</h5>
+                <h5 class="modal-title">
+                    <span class="modo-titulo">Nuevo</span> horario
+                </h5>
+
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
+
                 <input type="hidden" asp-for="Item.IdHorario" />
+
+          
                 <div class="mb-3">
-                    <label class="form-label">IdEmpleado</label>
-                    <input asp-for="Item.IdEmpleado" type="number" class="form-control" />
+                    <label class="form-label">Empleado</label>
+                    <select asp-for="Item.IdEmpleado" class="form-control">
+                        <option value="">-- Seleccione un empleado --</option>
+
+                        @foreach (var e in Model.Empleados)
+                        {
+                            <option value="@e.IdEmpleado">
+                                @Model.NombreEmpleado(e.IdEmpleado)
+                            </option>
+                        }
+                    </select>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">HoraEntrada</label>
-                    <input asp-for="Item.HoraEntrada" type="number" class="form-control" />
+                    <label class="form-label">Hora Entrada</label>
+                    <input asp-for="Item.HoraEntrada" class="form-control" type="number" />
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">HoraSalida</label>
-                    <input asp-for="Item.HoraSalida" type="number" class="form-control" />
+                    <label class="form-label">Hora Salida</label>
+                    <input asp-for="Item.HoraSalida" class="form-control" type="number" />
                 </div>
+
                 <div class="mb-3 form-check">
-                    <input asp-for="Item.Activo" type="checkbox" class="form-check-input" />
+                    <input asp-for="Item.Activo" class="form-check-input" type="checkbox" />
                     <label class="form-check-label">Activo</label>
                 </div>
+
             </div>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-oro">Guardar</button>
+                <button type="button" class="btn btn-fantasma" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-oro">
+                    Guardar
+                </button>
             </div>
+
         </form>
+
     </div>
 </div>

@@ -5,21 +5,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Asp_Presentaciones.Pages.Ventanas
 {
-    public class EmpleadosSedesModel : PaginaBase
+    public class EmpleadosPorSedeModel : PaginaBase
     {
         private readonly EmpleadosSedesPresentacion _negocio = new();
 
         public List<EmpleadoSede> Lista { get; private set; } = new();
+        public List<Empleados> Empleados { get; private set; } = new();
+        public List<Sedes> Sedes { get; private set; } = new();
+
         public List<FilaAuditoria> Auditoria { get; private set; } = new();
 
         [BindProperty] public EmpleadoSede Item { get; set; } = new();
-        [TempData]     public string? Mensaje  { get; set; }
-        [TempData]     public string? ErrorMsg { get; set; }
+
+        [TempData] public string? Mensaje { get; set; }
+        [TempData] public string? ErrorMsg { get; set; }
 
         public IActionResult OnGet()
         {
             var redir = ValidarAcceso("Administrador");
             if (redir != null) return redir;
+
             Cargar();
             return Page();
         }
@@ -28,13 +33,43 @@ namespace Asp_Presentaciones.Pages.Ventanas
         {
             var redir = ValidarAcceso("Administrador");
             if (redir != null) return redir;
+
             try
             {
-                if (Item.IdEmpleadoSede == 0) await _negocio.Guardar(Item, RolActual);
-                else _negocio.Modificar(Item, RolActual);
-                Mensaje = "Empleados por Sede guardado correctamente.";
+                if (Item.IdEmpleado == 0 || Item.IdSede == 0)
+                    throw new Exception("Debe seleccionar empleado y sede.");
+
+                Item.FechaAsignacion = DateTime.Now;
+
+              
+                var yaExiste = Lista.Any(x =>
+                    x.IdEmpleado == Item.IdEmpleado &&
+                    x.IdSede == Item.IdSede &&
+                    x.IdEmpleadoSede != Item.IdEmpleadoSede);
+
+                if (yaExiste)
+                    throw new Exception("Este empleado ya está asignado a esta sede.");
+
+               
+                var conflicto = Lista.Any(x =>
+                    x.IdEmpleado == Item.IdEmpleado &&
+                    x.IdEmpleadoSede != Item.IdEmpleadoSede);
+
+                if (conflicto)
+                    throw new Exception("El empleado ya está asignado a otra sede.");
+
+                if (Item.IdEmpleadoSede == 0)
+                    await _negocio.Guardar(Item, RolActual);
+                else
+                    _negocio.Modificar(Item, RolActual);
+
+                Mensaje = "Asignación guardada correctamente.";
             }
-            catch (Exception ex) { ErrorMsg = ex.Message; }
+            catch (Exception ex)
+            {
+                ErrorMsg = ex.Message;
+            }
+
             return RedirectToPage();
         }
 
@@ -42,13 +77,31 @@ namespace Asp_Presentaciones.Pages.Ventanas
         {
             var redir = ValidarAcceso("Administrador");
             if (redir != null) return redir;
+
             try
             {
                 _negocio.Eliminar(Item, RolActual);
-                Mensaje = "Empleados por Sede eliminado correctamente.";
+                Mensaje = "Asignación eliminada.";
             }
-            catch (Exception ex) { ErrorMsg = ex.Message; }
+            catch (Exception ex)
+            {
+                ErrorMsg = ex.Message;
+            }
+
             return RedirectToPage();
+        }
+
+      
+        public string NombreEmpleado(int id)
+        {
+            var emp = Empleados.FirstOrDefault(x => x.IdEmpleado == id);
+            return emp != null ? $"Empleado #{emp.IdEmpleado}" : $"Empleado #{id}";
+        }
+
+        public string NombreSede(int id)
+        {
+            var sede = Sedes.FirstOrDefault(x => x.IdSede == id);
+            return sede != null ? $"Sede #{sede.IdSede}" : $"Sede #{id}";
         }
 
         private void Cargar()
@@ -56,16 +109,23 @@ namespace Asp_Presentaciones.Pages.Ventanas
             try
             {
                 Lista = _negocio.Consultar(RolActual) ?? new();
+
+                Empleados = new EmpleadosPresentacion().Consultar(RolActual) ?? new();
+                Sedes = new SedesPresentacion().Consultar(RolActual) ?? new();
+
                 Auditoria = (_negocio.ConsultarAuditoria(RolActual) ?? new())
                     .Select(a => new FilaAuditoria
                     {
-                        IdAuditoria  = a.IdAuditoria,
+                        IdAuditoria = a.IdAuditoria,
                         IdReferencia = a.IdEmpleadoSede,
-                        Accion       = a.Accion ?? "",
-                        Fecha        = a.Fecha
+                        Accion = a.Accion ?? "",
+                        Fecha = a.Fecha
                     }).ToList();
             }
-            catch (Exception ex) { ErrorMsg = "No se pudo conectar con el API: " + ex.Message; }
+            catch (Exception ex)
+            {
+                ErrorMsg = "Error conexión API: " + ex.Message;
+            }
         }
     }
 }

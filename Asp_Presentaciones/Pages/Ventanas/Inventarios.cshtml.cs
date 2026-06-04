@@ -10,16 +10,23 @@ namespace Asp_Presentaciones.Pages.Ventanas
         private readonly InventariosPresentacion _negocio = new();
 
         public List<Inventarios> Lista { get; private set; } = new();
+        public List<Sedes> Sedes { get; private set; } = new();
         public List<FilaAuditoria> Auditoria { get; private set; } = new();
 
-        [BindProperty] public Inventarios Item { get; set; } = new();
-        [TempData]     public string? Mensaje  { get; set; }
-        [TempData]     public string? ErrorMsg { get; set; }
+        [BindProperty]
+        public Inventarios Item { get; set; } = new();
+
+        [TempData]
+        public string? Mensaje { get; set; }
+
+        [TempData]
+        public string? ErrorMsg { get; set; }
 
         public IActionResult OnGet()
         {
             var redir = ValidarAcceso("Administrador");
             if (redir != null) return redir;
+
             Cargar();
             return Page();
         }
@@ -28,13 +35,33 @@ namespace Asp_Presentaciones.Pages.Ventanas
         {
             var redir = ValidarAcceso("Administrador");
             if (redir != null) return redir;
+
             try
             {
-                if (Item.IdInventario == 0) await _negocio.Guardar(Item, RolActual);
-                else _negocio.Modificar(Item, RolActual);
-                Mensaje = "Inventarios guardado correctamente.";
+                if (Item.IdSede == 0)
+                    throw new Exception("Debes seleccionar una sede.");
+
+                if (Item.StockMinimo < 0)
+                    throw new Exception("El stock mínimo no puede ser negativo.");
+
+                Item.FechaActualizacion = DateTime.Now;
+
+                if (Item.IdInventario == 0)
+                {
+                    await _negocio.Guardar(Item, RolActual);
+                    Mensaje = "Inventario registrado correctamente.";
+                }
+                else
+                {
+                    _negocio.Modificar(Item, RolActual);
+                    Mensaje = "Inventario actualizado correctamente.";
+                }
             }
-            catch (Exception ex) { ErrorMsg = ex.Message; }
+            catch (Exception ex)
+            {
+                ErrorMsg = ex.Message;
+            }
+
             return RedirectToPage();
         }
 
@@ -42,13 +69,27 @@ namespace Asp_Presentaciones.Pages.Ventanas
         {
             var redir = ValidarAcceso("Administrador");
             if (redir != null) return redir;
+
             try
             {
                 _negocio.Eliminar(Item, RolActual);
-                Mensaje = "Inventarios eliminado correctamente.";
+                Mensaje = "Inventario eliminado correctamente.";
             }
-            catch (Exception ex) { ErrorMsg = ex.Message; }
+            catch (Exception ex)
+            {
+                ErrorMsg = ex.Message;
+            }
+
             return RedirectToPage();
+        }
+
+        public string NombreSede(int idSede)
+        {
+            var sede = Sedes.FirstOrDefault(s => s.IdSede == idSede);
+
+            return sede == null
+                ? $"Sede #{idSede}"
+                : sede.Nombre;
         }
 
         private void Cargar()
@@ -56,16 +97,21 @@ namespace Asp_Presentaciones.Pages.Ventanas
             try
             {
                 Lista = _negocio.Consultar(RolActual) ?? new();
+                Sedes = new SedesPresentacion().Consultar(RolActual) ?? new();
+
                 Auditoria = (_negocio.ConsultarAuditoria(RolActual) ?? new())
                     .Select(a => new FilaAuditoria
                     {
-                        IdAuditoria  = a.IdAuditoria,
+                        IdAuditoria = a.IdAuditoria,
                         IdReferencia = a.IdInventario,
-                        Accion       = a.Accion ?? "",
-                        Fecha        = a.Fecha
+                        Accion = a.Accion ?? "",
+                        Fecha = a.Fecha
                     }).ToList();
             }
-            catch (Exception ex) { ErrorMsg = "No se pudo conectar con el API: " + ex.Message; }
+            catch (Exception ex)
+            {
+                ErrorMsg = "No se pudo conectar con el API: " + ex.Message;
+            }
         }
     }
 }

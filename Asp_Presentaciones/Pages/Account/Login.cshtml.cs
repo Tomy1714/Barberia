@@ -49,7 +49,7 @@ namespace Asp_Presentaciones.Pages.Account
             }
             catch
             {
-                Error = "No se pudo iniciar sesión. Verifique sus datos papi.";
+                Error = "No se pudo iniciar sesión. Verifica tus datos.";
                 return Page();
             }
         }

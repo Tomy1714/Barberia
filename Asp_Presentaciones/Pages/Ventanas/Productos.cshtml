@@ -1,17 +1,32 @@
 @page
 @model Asp_Presentaciones.Pages.Ventanas.ProductosModel
-@{ ViewData["Title"] = "Productos"; }
+@{
+    ViewData["Title"] = "Productos";
+}
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
         <h1 style="color:var(--bb-oro-claro);margin:0">Productos</h1>
-        <p class="text-tenue mb-0">Cositas pa vender</p>
+        <p class="text-tenue mb-0">Artículos de inventario y venta</p>
     </div>
-    <button class="btn btn-oro" onclick="bbAbrirModal('modalProductos', null)">+ Agregar</button>
+    <button class="btn btn-oro" onclick="bbAbrirModal('modalProductos', null)">+ Agregar producto</button>
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje)) { <div class="alert alert-success py-2">@Model.Mensaje</div> }
-@if (!string.IsNullOrEmpty(Model.ErrorMsg)) { <div class="alert alert-danger py-2">@Model.ErrorMsg</div> }
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success py-2">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger  py-2">@Model.ErrorMsg</div>
+}
+
+@if (Model.ProductosCriticos > 0)
+{
+    <div class="alert alert-warning py-2">
+        ⚠️ <strong>@Model.ProductosCriticos producto(s)</strong> con stock bajo o agotado.
+    </div>
+}
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReg">Registros</a></li>
@@ -20,82 +35,149 @@
 
 <div class="tab-content">
     <div class="tab-pane fade show active" id="tabReg">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <table class="bb-table">
-                <thead><tr><th>#</th>
-<th>Nombre</th>
-<th>Marca</th>
-<th>Categoría</th>
-<th>Precio Venta</th>
-<th>Stock</th>
-<th class='acciones'>Acciones</th></tr></thead>
-                <tbody>
-                    @if (Model.Lista.Count == 0) { <tr><td colspan="7" class="text-tenue text-center py-4">Sin registros.</td></tr> }
-                    @foreach (var p in Model.Lista)
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(new { p.IdProducto, p.Nombre, p.Marca, p.Categoria, p.PrecioVenta, p.StockActual });
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <table class="bb-table">
+                    <thead>
                         <tr>
-                            <td>@p.IdProducto</td>
-<td>@p.Nombre</td>
-<td>@p.Marca</td>
-<td>@p.Categoria</td>
-<td>@p.PrecioVenta</td>
-<td>@p.StockActual</td>
-                            <td class="acciones">
-                                <button class="btn btn-sm btn-fantasma" data-json="@json"
-                                    onclick="bbAbrirModal('modalProductos', JSON.parse(this.dataset.json))">Editar</button>
-                                <form method="post" asp-page-handler="Eliminar" class="d-inline" onsubmit="return bbConfirmarBorrado(event)">
-                                    <input type="hidden" name="Item.IdProducto" value="@p.IdProducto" />
-                                    <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
-                                </form>
-                            </td>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Marca</th>
+                            <th>Categoría</th>
+                            <th>P. Compra</th>
+                            <th>P. Venta</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th class="acciones">Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+                    </thead>
+                    <tbody>
+                        @if (Model.Lista.Count == 0)
+                        {
+                            <tr><td colspan="9" class="text-tenue text-center py-4">Sin productos.</td></tr>
+                        }
+                        @foreach (var p in Model.Lista)
+                        {
+                            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                            {
+                                p.IdProducto,
+                                p.Nombre,
+                                p.Marca,
+                                p.Categoria,
+                                p.PrecioCompra,
+                                p.PrecioVenta,
+                                p.StockActual,
+                                p.Activo
+                            });
+                            bool critico = p.StockActual <= 0;
+                            <tr>
+                                <td>@p.IdProducto</td>
+                                <td><strong>@p.Nombre</strong></td>
+                                <td>@p.Marca</td>
+                                <td>@p.Categoria</td>
+                                <td>$@p.PrecioCompra.ToString("N0")</td>
+                                <td>$@p.PrecioVenta.ToString("N0")</td>
+                                <td>
+                                    <span class="estado @(critico ? "inactivo" : p.StockActual <= 5 ? "" : "activo")">
+                                        @p.StockActual uds
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="estado @(p.Activo ? "activo" : "inactivo")">
+                                        @(p.Activo ? "Activo" : "Inactivo")
+                                    </span>
+                                </td>
+                                <td class="acciones">
+                                  
+                                    <form method="post" asp-page-handler="CalcularMargen" class="d-inline">
+                                        <input type="hidden" name="Item.IdProducto" value="@p.IdProducto" />
+                                        <input type="hidden" name="Item.PrecioCompra" value="@p.PrecioCompra.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                        <input type="hidden" name="Item.PrecioVenta" value="@p.PrecioVenta.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                        <input type="hidden" name="Item.Nombre" value="@p.Nombre" />
+                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-oro-claro)">
+                                             Margen
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-sm btn-fantasma" data-json="@json"
+                                            onclick="bbAbrirModal('modalProductos', JSON.parse(this.dataset.json))">
+                                        Editar
+                                    </button>
+                                    <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                                          onsubmit="return bbConfirmarBorrado(event)">
+                                        <input type="hidden" name="Item.IdProducto" value="@p.IdProducto" />
+                                        <button type="submit" class="btn btn-sm btn-fantasma" style="color:var(--bb-rojo)">Borrar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <div class="tab-pane fade" id="tabAud">
-        <div class="bb-card"><div class="bb-card-body p-0">
-            <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Productos"))" />
-        </div></div>
+        <div class="bb-card">
+            <div class="bb-card-body p-0">
+                <partial name="_AuditoriaTab" model="@((Model.Auditoria, "Producto"))" />
+            </div>
+        </div>
     </div>
 </div>
+
+
+@if (Model.MargenCalculado.HasValue)
+{
+    <div class="alert alert-info mt-3 py-2">
+         <strong>@Model.NombreProducto</strong> —
+        Margen: <strong style="color:var(--bb-oro-claro)">$@Model.MargenCalculado.Value.ToString("N0")</strong>
+        (@Model.PorcentajeMargen.Value.ToString("N1")% de ganancia)
+    </div>
+}
 
 <div class="modal fade" id="modalProductos" tabindex="-1">
     <div class="modal-dialog">
         <form method="post" asp-page-handler="Guardar" class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> productos</h5>
+                <h5 class="modal-title"><span class="modo-titulo">Nuevo</span> producto</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" asp-for="Item.IdProducto" />
                 <div class="mb-3">
                     <label class="form-label">Nombre</label>
-                    <input asp-for="Item.Nombre" type="text" class="form-control" />
+                    <input asp-for="Item.Nombre" class="form-control" required />
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label">Marca</label>
+                        <input asp-for="Item.Marca" class="form-control" />
+                    </div>
+                    <div class="col mb-3">
+                        <label class="form-label">Categoría</label>
+                        <select asp-for="Item.Categoria" class="form-select">
+                            <option value="">— Seleccione —</option>
+                            @foreach (var cat in ProductosModel.Categorias)
+                            {
+                                <option value="@cat">@cat</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label">Precio compra ($)</label>
+                        <input asp-for="Item.PrecioCompra" type="number" min="0" step="100" class="form-control" required />
+                    </div>
+                    <div class="col mb-3">
+                        <label class="form-label">Precio venta ($)</label>
+                        <input asp-for="Item.PrecioVenta" type="number" min="0" step="100" class="form-control" required />
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Marca</label>
-                    <input asp-for="Item.Marca" type="text" class="form-control" />
+                    <label class="form-label">Stock actual</label>
+                    <input asp-for="Item.StockActual" type="number" min="0" class="form-control" required />
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Categoria</label>
-                    <input asp-for="Item.Categoria" type="text" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">PrecioCompra</label>
-                    <input asp-for="Item.PrecioCompra" type="number" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">PrecioVenta</label>
-                    <input asp-for="Item.PrecioVenta" type="number" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">StockActual</label>
-                    <input asp-for="Item.StockActual" type="number" class="form-control" />
-                </div>
-                <div class="mb-3 form-check">
+                <div class="form-check">
                     <input asp-for="Item.Activo" type="checkbox" class="form-check-input" />
                     <label class="form-check-label">Activo</label>
                 </div>

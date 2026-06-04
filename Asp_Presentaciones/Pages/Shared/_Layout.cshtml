@@ -29,7 +29,7 @@
                 <div class="container">
                     <a class="navbar-brand bb-brand" asp-page="/Index">
                         <span class="pole"></span>
-                        <span class="nombre">Barbería <b>BarberPro</b></span>
+                        <span class="nombre">Barbería <b>Barberia Chimpanperro</b></span>
                     </a>
                     <img src="~/images/logo.png"
                          alt="Logo"
@@ -70,11 +70,7 @@
                                     <li><a class="dropdown-item" asp-page="/Ventanas/ServiciosTratamiento">Tratamientos</a></li>
                                     <li><a class="dropdown-item" asp-page="/Ventanas/Combos">Combos</a></li>
                                     <li><a class="dropdown-item" asp-page="/Ventanas/Promociones">Promociones</a></li>
-                                    @if (admin || recep)
-                                    {
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" asp-page="/Ventanas/Sedes">Sedes</a></li>
-                                    }
+
                                 </ul>
                             </li>
 
@@ -126,14 +122,14 @@
                             }
 
                         
-                            @if (admin || recep || cliente)
+                            @if (admin || recep || cliente )
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Facturación</a>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" asp-page="/Ventanas/Pagos">Pagos</a></li>
                                         <li><a class="dropdown-item" asp-page="/Ventanas/Facturas">Facturas</a></li>
-                                        @if (admin || recep)
+                                        @if (admin || recep || barbero)
                                         {
                                             <li><a class="dropdown-item" asp-page="/Ventanas/Notificaciones">Notificaciones</a></li>
                                         }
@@ -145,7 +141,7 @@
                             @if (admin || cliente)
                             {
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Fidelización</a>
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Extras</a>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" asp-page="/Ventanas/PuntosFidelidad">Puntos de Fidelidad</a></li>
                                         <li><a class="dropdown-item" asp-page="/Ventanas/Calificaciones">Calificaciones</a></li>
@@ -158,13 +154,24 @@
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Sistema</a>
+
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-page="/Ventanas/Usuarios">Usuarios</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Ventanas/ComboServicios">Combo Servicios</a></li>
+
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Ventanas/Usuarios">
+                                                Usuarios
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Ventanas/Sedes">
+                                                Sedes
+                                            </a>
+                                        </li>
+
                                     </ul>
                                 </li>
                             }
-
                         </ul>
 
                         <div class="d-flex align-items-center gap-3">
@@ -188,7 +195,7 @@
 
     <footer class="bb-footer">
         <div class="container d-flex justify-content-between">
-            <span>&copy; 2026 · Barbería BarberPro</span>
+            <span>&copy; 2026 · Barbería Chimpanperro</span>
             <span class="text-tenue">Sistema de gestión</span>
         </div>
     </footer>
